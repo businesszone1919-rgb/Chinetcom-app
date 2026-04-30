@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="am">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chinetcom Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root { --primary: #5d78ff; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        h2 { color: var(--primary); text-align: center; margin-bottom: 20px; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tabs button { flex: 1; padding: 12px; border: none; border-radius: 8px; cursor: pointer; background: #ddd; font-weight: bold; }
+        .tabs button.active { background: var(--primary); color: white; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 14px; }
+        .btn-send { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-send:active { transform: scale(0.98); }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>🚚 Chinetcom</h2>
+    <div class="tabs">
+        <button id="tabLoad" class="active" onclick="switchForm('load')">እቃ ጫኝ</button>
+        <button id="tabDriver" onclick="switchForm('driver')">ሹፌር</button>
+    </div>
+
+    <div id="loadForm">
+        <div class="input-group">
+            <label>የጭነት ባለቤት ስም *</label>
+            <input type="text" id="ownerName" placeholder="ስምዎን ያስገቡ">
+        </div>
+        <div class="input-group">
+            <label>መነሻ ቦታ *</label>
+            <input type="text" id="fromLoc" placeholder="ለምሳሌ፡ ባህር ዳር">
+        </div>
+        <div class="input-group">
+            <label>መድረሻ ቦታ *</label>
+            <input type="text" id="toLoc" placeholder="ለምሳሌ፡ አዲስ አበባ">
+        </div>
+        <div class="input-group">
+            <label>የሚፈለግ መኪና *</label>
+            <select id="truck">
+                <option>አይሱዙ (Isuzu)</option>
+                <option>ሲኖትራክ (Sinotruk)</option>
+                <option>ኤፍኤስአር (FSR)</option>
+                <option>ሎደር (Loader)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>ስለ ጭነቱ ተጨማሪ መግለጫ</label>
+            <textarea id="desc" rows="2" placeholder="የእቃው አይነት፣ ክብደት..."></textarea>
+        </div>
+        <button class="btn-send" onclick="submitData('load')">የጭነት ጥያቄ ላክ</button>
+    </div>
+
+    <div id="driverForm" class="hidden">
+        <div class="input-group">
+            <label>የሹፌር ሙሉ ስም *</label>
+            <input type="text" id="driverName">
+        </div>
+        <div class="input-group">
+            <label>የስልክ ቁጥር *</label>
+            <input type="tel" id="driverPhone" placeholder="09...">
+        </div>
+        <div class="input-group">
+            <label>የመኪና ሰሌዳ ቁጥር *</label>
+            <input type="text" id="plate" placeholder="ኮድ 3 - A00000">
+        </div>
+        <button class="btn-send" onclick="submitData('driver')">አሁኑኑ ተመዝገብ</button>
+    </div>
+</div>
+
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+
+    function switchForm(type) {
+        if(type === 'load') {
+            document.getElementById('loadForm').classList.remove('hidden');
+            document.getElementById('driverForm').classList.add('hidden');
+            document.getElementById('tabLoad').classList.add('active');
+            document.getElementById('tabDriver').classList.remove('active');
+        } else {
+            document.getElementById('loadForm').classList.add('hidden');
+            document.getElementById('driverForm').classList.remove('hidden');
+            document.getElementById('tabLoad').classList.remove('active');
+            document.getElementById('tabDriver').classList.add('active');
+        }
+    }
+
+    function submitData(type) {
+        let payload = { type: type };
+        if(type === 'load') {
+            payload.name = document.getElementById('ownerName').value;
+            payload.from = document.getElementById('fromLoc').value;
+            payload.to = document.getElementById('toLoc').value;
+            payload.truck = document.getElementById('truck').value;
+            payload.desc = document.getElementById('desc').value;
+        } else {
+            payload.name = document.getElementById('driverName').value;
+            payload.phone = document.getElementById('driverPhone').value;
+            payload.plate = document.getElementById('plate').value;
+        }
+
+        if(!payload.name) { alert("እባክዎ ስም ያስገቡ!"); return; }
+
+        fetch('/submit', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        }).then(() => {
+            alert("መረጃው ለወኪሉ በስኬት ደርሷል!");
+            tg.close();
+        }).catch(err => alert("ስህተት ተከስቷል፣ እባክዎ ድጋሚ ይሞክሩ"));
+    }
+</script>
+</body>
+</html>
