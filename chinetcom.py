@@ -7,14 +7,14 @@ app = Flask(__name__)
 # --- የቴሌግራም መረጃዎች ---
 BOT_TOKEN = "8696739619:AAHgsWzNmhkLBGdC_cBy-IXpiZ0RcQZZqpY"
 
-# ትክክለኛዎቹን IDs እዚህ ጋር እናረጋግጣለን
+# መረጃ የሚላክባቸው ቦታዎች (IDs)
 TARGET_CHATS = [
     "-1003606657314",  # የቻናል ID
-    "-1003961942282",  # የግሩፕ ID
+    "-1003961942282"   # የግሩፕ ID
 ]
 
 def send_to_telegram(message):
-    """መረጃውን ወደ ቴሌግራም ይልካል እና ውጤቱን በ Log ያሳያል"""
+    """መረጃውን ወደ ቴሌግራም ይልካል"""
     for chat_id in TARGET_CHATS:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         payload = {
@@ -24,8 +24,8 @@ def send_to_telegram(message):
         }
         try:
             response = requests.post(url, json=payload, timeout=15)
-            # ይህ መስመር በ Render Log ላይ ውጤቱን ያሳያል (በጣም አስፈላጊ ነው)
-            print(f"DEBUG: Telegram Response for {chat_id}: {response.text}")
+            # የቴሌግራም መልስ በ Render Log ላይ እንዲታይ
+            print(f"DEBUG: Chat {chat_id} Response: {response.text}")
         except Exception as e:
             print(f"DEBUG: Connection Error for {chat_id}: {e}")
 
@@ -37,8 +37,6 @@ def index():
 def submit():
     try:
         data = request.get_json(force=True)
-        print(f"DEBUG: Received data: {data}") # የመጣውን መረጃ ቼክ ለማድረግ
-        
         if data.get('type') == 'load':
             msg = (f"🚚 *አዲስ የጭነት ጥያቄ*\n\n"
                    f"🏢 *ድርጅት:* {data.get('org', '---')}\n"
