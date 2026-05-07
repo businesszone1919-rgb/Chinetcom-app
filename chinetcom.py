@@ -10,7 +10,7 @@ BOT_TOKEN = "8696739619:AAHgsWzNmhkLBGdC_cBy-IXpiZ0RcQZZqpY"
 # መረጃ የሚላክባቸው ቦታዎች (IDs) ዝርዝር
 # አሁን ባለው ሁኔታ ለቻናልህ ተዘጋጅቷል፤ የግሩፕ ID ሲኖርህ እዚህ ዝርዝር ውስጥ መጨመር ትችላለህ
 TARGET_CHATS = [
-    "-1002426865615",  # የ Chinet com ቻናል ID
+    "--1003606657314",  # የ Chinet com ቻናል ID
 ]
 
 def send_to_telegram(message):
