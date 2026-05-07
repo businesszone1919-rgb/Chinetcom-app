@@ -7,17 +7,14 @@ app = Flask(__name__)
 # --- የቴሌግራም መረጃዎች ---
 BOT_TOKEN = "8696739619:AAHgsWzNmhkLBGdC_cBy-IXpiZ0RcQZZqpY"
 
-# መረጃ የሚላክባቸው ቦታዎች (IDs) ዝርዝር
-# አሁን ባለው ሁኔታ ለቻናልህ ተዘጋጅቷል፤ የግሩፕ ID ሲኖርህ እዚህ ዝርዝር ውስጥ መጨመር ትችላለህ
-TARGET_CHATS = [
-    "--# መረጃ የሚላክባቸው ቦታዎች (IDs)
+# ትክክለኛዎቹን IDs እዚህ ጋር እናረጋግጣለን
 TARGET_CHATS = [
     "-1003606657314",  # የቻናል ID
-    "-1003961942282",  # አሁን የላክኸው የግሩፕ ID
+    "-1003961942282",  # የግሩፕ ID
 ]
 
 def send_to_telegram(message):
-    """መረጃውን በ TARGET_CHATS ውስጥ ላሉ ቦታዎች በሙሉ ይልካል"""
+    """መረጃውን ወደ ቴሌግራም ይልካል እና ውጤቱን በ Log ያሳያል"""
     for chat_id in TARGET_CHATS:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
         payload = {
@@ -26,21 +23,21 @@ def send_to_telegram(message):
             "parse_mode": "Markdown"
         }
         try:
-            response = requests.post(url, json=payload, timeout=10)
-            print(f"Sent to {chat_id}: {response.status_code}")
+            response = requests.post(url, json=payload, timeout=15)
+            # ይህ መስመር በ Render Log ላይ ውጤቱን ያሳያል (በጣም አስፈላጊ ነው)
+            print(f"DEBUG: Telegram Response for {chat_id}: {response.text}")
         except Exception as e:
-            print(f"Error sending to {chat_id}: {e}")
+            print(f"DEBUG: Connection Error for {chat_id}: {e}")
 
 @app.route('/')
 def index():
-    # በ templates ፎልደር ውስጥ ያለውን index.html ይከፍታል
     return render_template('index.html')
 
 @app.route('/submit', methods=['POST'])
 def submit():
     try:
-        # ከዌብሳይቱ (Frontend) የሚመጣውን መረጃ መቀበል
         data = request.get_json(force=True)
+        print(f"DEBUG: Received data: {data}") # የመጣውን መረጃ ቼክ ለማድረግ
         
         if data.get('type') == 'load':
             msg = (f"🚚 *አዲስ የጭነት ጥያቄ*\n\n"
@@ -49,24 +46,20 @@ def submit():
                    f"📞 *ስልክ:* {data.get('phone', '---')}\n"
                    f"📍 *መነሻ:* {data.get('from', '---')}\n"
                    f"🏁 *መድረሻ:* {data.get('to', '---')}\n"
-                   f"🚛 *መኪና:* {data.get('truck', '---')}\n"
-                   f"📝 *ዝርዝር:* {data.get('desc', '---')}")
+                   f"🚛 *መኪና:* {data.get('truck', '---')}")
         else:
             msg = (f"🚐 *አዲስ የሹፌር ምዝገባ*\n\n"
                    f"👤 *ሹፌር:* {data.get('dName', '---')}\n"
                    f"📞 *ስልክ:* {data.get('dPhone', '---')}\n"
                    f"🔢 *ሰሌዳ:* {data.get('plate', '---')}\n"
-                   f"🚛 *የመኪና አይነት:* {data.get('vType', '---')}")
+                   f"🚛 *አይነት:* {data.get('vType', '---')}")
         
-        # መልእክቱን ለሁሉም ኢላማዎች መላክ
         send_to_telegram(msg)
-        return jsonify({"status": "success", "message": "መረጃው በስኬት ተልኳል!"})
-        
+        return jsonify({"status": "success", "message": "መረጃው ተልኳል!"})
     except Exception as e:
-        print(f"Processing Error: {e}")
-        return jsonify({"status": "error", "message": "ስህተት ተከስቷል"}), 400
+        print(f"DEBUG: Server Error: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 if __name__ == '__main__':
-    # Render ላይ እንዲሰራ ፖርቱን ከ Environment Variable ያነባል
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
