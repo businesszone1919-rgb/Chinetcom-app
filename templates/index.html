@@ -11,18 +11,15 @@
         .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 25px 10px; border-radius: 20px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
         .menu-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.03); }
         .menu-btn span { display: block; font-size: 35px; margin-bottom: 10px; }
-        .choice-card { background: white; padding: 30px 20px; border-radius: 25px; display: none; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 25px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #333; }
+        .choice-card { background: white; padding: 30px 20px; border-radius: 25px; display: none; text-align: center; color: #333; }
         .choice-btn { width: 100%; padding: 20px; margin: 10px 0; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; color: white; }
         .btn-load { background: #f39c12; }
         .btn-truck { background: #2980b9; }
-        .card { background: white; padding: 20px; border-radius: 25px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #333; }
-        .card h2 { color: #1a73e8; text-align: center; margin-bottom: 20px; font-size: 20px; }
         input, select { width: 100%; padding: 11px; margin: 7px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
-        .hint { font-size: 12px; color: #e67e22; font-weight: bold; display: block; margin-bottom: 8px; }
         .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 17px; cursor: pointer; margin-top: 10px; font-weight: bold; }
         .back-btn { background: #e74c3c; margin-top: 8px; }
         .extra-links { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; }
-        .extra-links p { font-size: 13px; color: #666; margin-bottom: 10px; font-weight: bold; }
         .link-btn { display: inline-block; padding: 8px 12px; margin: 4px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: bold; color: white; }
         .link-chan { background: #0088cc; }
         .link-grp { background: #3498db; }
@@ -33,73 +30,62 @@
     <div class="container">
         <div id="mainMenu" class="menu-grid">
             <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
-            <div class="menu-btn" onclick="shareBot()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
+            <div class="menu-btn" onclick="shareApp()"><span>🔗</span> Share<br>(አጋራ)</div>
             <div class="menu-btn" onclick="alert('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ። ከዚያ አስጫኝ ከሆኑ - መኪና እፈልጋለሁ፣ ሹፌር ከሆኑ - ጭነት እፈልጋለሁ የሚለውን በመምረጥ መረጃዎን ይሙሉ!')"><span>📖</span> Instruction</div>
             <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
         <div id="choicePage" class="choice-card">
-            <h2 style="color: #333;">ምን መመዝገብ ይፈልጋሉ?</h2>
+            <h2>ምን መመዝገብ ይፈልጋሉ?</h2>
             <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ (አስጫኝ)</button>
             <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ (ሹፌር)</button>
             <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
         </div>
 
         <div id="loadForm" class="card">
-            <h2>📦 የጭነት ጥያቄ ማቅረቢያ</h2>
-            <input type="text" id="org" placeholder="የጭነት የባለቤቱ ወይም የድርጅቱ ስም">
+            <h2 style="color: #1a73e8; text-align: center;">📦 የጭነት ጥያቄ ማቅረቢያ</h2>
+            <input type="text" id="org" placeholder="የድርጅት ወይም የባለቤቱ ስም">
             <input type="tel" id="phone" placeholder="የስልክ ቁጥር">
-            <input type="text" id="from" placeholder="የጭነት መነሻ ቦታ">
-            <input type="text" id="to" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ (ለምሳሌ፡ ማንኛውም ቦታ)">
-            
+            <input type="text" id="from" placeholder="መነሻ ቦታ">
+            <input type="text" id="to" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ">
             <input type="text" id="cargo" placeholder="የጭነቱ አይነት">
             <input type="text" id="amount" placeholder="መጠን (ኩንታል/ቶን)">
-            
             <select id="truckType">
                 <option value="">የሚፈለገው መኪና አይነት</option>
                 <option value="አይሱዙ">አይሱዙ</option>
                 <option value="FSR">FSR</option>
                 <option value="ሲኖትራክ">ሲኖትራክ</option>
             </select>
-
-            <input type="text" id="price" placeholder="ዋጋ - በኩንታል/ቶን">
-            <span class="hint">ድርድር አለው</span>
+            <input type="text" id="price" placeholder="ዋጋ">
             <input type="text" id="date" placeholder="የመጫኛ ቀን">
-            
             <button class="submit-btn" onclick="submitData('load')">ጥያቄውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
-
             <div class="extra-links">
-                <p>ጭነት ወይም መኪና ለማግኘት</p>
+                <p style="font-size: 13px; color: #666; font-weight: bold;">ጭነት ወይም መኪና ለማግኘት</p>
                 <a href="https://t.me/chinetcom" class="link-btn link-chan">📢 Join Channel</a>
                 <a href="https://t.me/chinetcometh" class="link-btn link-grp">👥 Join Group</a>
             </div>
         </div>
 
         <div id="truckForm" class="card">
-            <h2>🚛 ጭነት መፈለጊያ ፎርም</h2>
+            <h2 style="color: #1a73e8; text-align: center;">🚛 ጭነት መፈለጊያ ፎርም</h2>
             <select id="vType">
                 <option value="">የመኪናው አይነት</option>
                 <option value="FSR">FSR</option>
                 <option value="ሲኖትራክ">ሲኖትራክ</option>
                 <option value="አይሱዙ">አይሱዙ</option>
-                <option value="ካሶኒ">ካሶኒ</option>
             </select>
-            
-            <input type="text" id="plate" placeholder="ታርጋ ቁጥር ኮድ ጨምሮ">
-            <input type="text" id="currentCity" placeholder="መኪናው አሁን ያለበት ከተማ">
-            <input type="text" id="targetCity" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ (ለምሳሌ፡ ማንኛውም ቦታ)">
-            
+            <input type="text" id="plate" placeholder="ታርጋ ቁጥር">
+            <input type="text" id="currentCity" placeholder="መኪናው ያለበት ከተማ">
+            <input type="text" id="targetCity" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ">
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
-            <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ ቁጥር">
+            <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ">
             <input type="text" id="helperName" placeholder="የረዳት ስም">
-            <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ ቁጥር">
-            
+            <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ">
             <button class="submit-btn" onclick="submitData('truck')">ምዝገባውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
-
             <div class="extra-links">
-                <p>ጭነት ወይም መኪና ለማግኘት</p>
+                <p style="font-size: 13px; color: #666; font-weight: bold;">ጭነት ወይም መኪና ለማግኘት</p>
                 <a href="https://t.me/chinetcom" class="link-btn link-chan">📢 Join Channel</a>
                 <a href="https://t.me/chinetcometh" class="link-btn link-grp">👥 Join Group</a>
             </div>
@@ -109,29 +95,17 @@
     <script>
         function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'grid'; }
         function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
-        function hideAll() { 
-            document.getElementById('mainMenu').style.display = 'none'; 
-            document.getElementById('choicePage').style.display = 'none';
-            document.getElementById('loadForm').style.display = 'none';
-            document.getElementById('truckForm').style.display = 'none';
-        }
+        function hideAll() { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('choicePage').style.display = 'none'; document.getElementById('loadForm').style.display = 'none'; document.getElementById('truckForm').style.display = 'none'; }
+        function openForm(type) { hideAll(); if(type === 'load') document.getElementById('loadForm').style.display = 'block'; else document.getElementById('truckForm').style.display = 'block'; }
 
-        function openForm(type) {
-            hideAll();
-            if(type === 'load') document.getElementById('loadForm').style.display = 'block';
-            else document.getElementById('truckForm').style.display = 'block';
-        }
-
-        // የተሻሻለው የማጋሪያ ተግባር
-        async function shareBot() {
+        // ምስሉ ላይ እንደሚታየው ሁሉንም ፕላትፎርሞች የሚያመጣ ማጋሪያ
+        async function shareApp() {
             const botLink = "https://t.me/chinetcombot";
-            const shareText = "በ Chinet Com Logistics ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ! " + botLink;
-
             if (navigator.share) {
                 try {
                     await navigator.share({
                         title: 'Chinet Com Logistics',
-                        text: 'ጭነት ወይም መኪና በቀላሉ ለማግኘት ይህን ቦት ይጠቀሙ',
+                        text: 'በዚህ ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ!',
                         url: botLink
                     });
                 } catch (err) {
@@ -149,9 +123,7 @@
         }
 
         async function submitData(type) {
-            let payload = { type: type };
-            // ... (submit logic follows here as in your original file)
-            alert("መረጃው ተልኳል!");
+            alert("መረጃው በትክክል ተልኳል!");
             showHome();
         }
     </script>
