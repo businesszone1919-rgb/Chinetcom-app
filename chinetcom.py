@@ -5,18 +5,30 @@ import threading
 
 app = Flask(__name__)
 
-# --- የቴሌግራም መረጃዎች ---
+# --- የቴሌግራም እና የቦት መረጃዎች ---
 BOT_TOKEN = "8696739619:AAHgsWzNmhkLBGdC_cBy-IXpiZ0RcQZZqpY"
 ADMIN_ID = "7900431028"
 CHANNEL_ID = "-1003606657314"
 GROUP_ID = "-1003961942282"
 AGENT_USERNAME = "chinetcomet"
 
+# ትክክለኛ ሊንኮች
+BOT_LINK = "https://t.me/chinetcombot"
+CHANNEL_LINK = "https://t.me/chinetcom"
+GROUP_LINK = "https://t.me/chinetcometh"
+
 def send_to_telegram(chat_id, message, reply_markup=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown", "reply_markup": reply_markup}
-    try: return requests.post(url, json=payload, timeout=15).json()
-    except: return None
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "Markdown",
+        "reply_markup": reply_markup
+    }
+    try:
+        return requests.post(url, json=payload, timeout=15).json()
+    except:
+        return None
 
 @app.route('/')
 def index():
@@ -50,7 +62,12 @@ def submit():
                    f"👥 ረዳት: {data.get('helperName', '---')}\n"
                    f"📞 ረዳት ስልክ: {data.get('helperPhone', '---')}")
 
-        markup = {"inline_keyboard": [[{"text": "✅ Approve", "callback_data": "approve_post"},{"text": "❌ Reject", "callback_data": "reject_post"}]]}
+        markup = {
+            "inline_keyboard": [[
+                {"text": "✅ Approve", "callback_data": "approve_post"},
+                {"text": "❌ Reject", "callback_data": "reject_post"}
+            ]]
+        }
         send_to_telegram(ADMIN_ID, f"⚠️ *አዲስ ጥያቄ መጥቷል!*\n\n{msg}", markup)
         return jsonify({"status": "success", "message": "መረጃው ተልኳል፤ አድሚን ሲያጸድቀው ይለጠፋል።"})
     except Exception as e:
@@ -71,19 +88,34 @@ def bot_polling():
                         
                         if cb["data"] == "approve_post":
                             lines = raw_text.split('\n')
-                            # ታርጋ፣ ስምና ስልክን የማጣራት ስራ
+                            # ሚስጥራዊ መረጃዎችን የመቀነስ ስራ
                             filtered = [l for l in lines if not any(x in l for x in ["📞 ስልክ", "👤 ሹፌር", "👤 የጭነት ባለቤት", "👥 ረዳት", "📞 ረዳት ስልክ", "🔢 ታርጋ"])]
-                            final_post = "\n".join(filtered) + f"\n\n📩 *መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ*👇"
-                            agent_markup = {"inline_keyboard": [[{"text": "👤 Contact Agent", "url": f"https://t.me/{AGENT_USERNAME}"}]]}
                             
-                            send_to_telegram(CHANNEL_ID, final_post, agent_markup)
-                            send_to_telegram(GROUP_ID, final_post, agent_markup)
+                            # የፖስት ይዘት ግንባታ
+                            final_post = "\n".join(filtered)
+                            final_post += f"\n\n✨ *ያሉበት ቦታ ሆነው ጭነት ወይም መኪና ለማግኘት ሊንኩን ይጫኑ*👇\n🔗 {BOT_LINK}"
+                            final_post += f"\n\n📩 *መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ*👇"
+                            
+                            # የሊንክ ቁልፎች (Buttons)
+                            post_markup = {
+                                "inline_keyboard": [
+                                    [{"text": "👤 ኤጀንቱን አግኝ (Contact)", "url": f"https://t.me/{AGENT_USERNAME}"}],
+                                    [{"text": "📢 Join Channel", "url": CHANNEL_LINK},
+                                     {"text": "👥 Join Group", "url": GROUP_LINK}]
+                                ]
+                            }
+                            
+                            send_to_telegram(CHANNEL_ID, final_post, post_markup)
+                            send_to_telegram(GROUP_ID, final_post, post_markup)
+                            
                             requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
                                           json={"chat_id": ADMIN_ID, "message_id": cb["message"]["message_id"], "text": f"✅ ተለጥፏል\n\n{raw_text}"})
+                        
                         elif cb["data"] == "reject_post":
                             requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
                                           json={"chat_id": ADMIN_ID, "message_id": cb["message"]["message_id"], "text": f"❌ ውድቅ ተደርጓል\n\n{raw_text}"})
-        except: pass
+        except:
+            pass
 
 threading.Thread(target=bot_polling, daemon=True).start()
 
