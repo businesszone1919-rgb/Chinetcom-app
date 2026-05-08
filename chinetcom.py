@@ -1,26 +1,29 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import os
+import threading
 
 app = Flask(__name__)
 
 # --- የቴሌግራም መረጃዎች ---
 BOT_TOKEN = "8696739619:AAHgsWzNmhkLBGdC_cBy-IXpiZ0RcQZZqpY"
-TARGET_CHATS = ["-1003606657314", "-1003961942282"]
+ADMIN_ID = "7900431028"
+CHANNEL_ID = "-1003606657314"
+GROUP_ID = "-1003961942282"
+AGENT_USERNAME = "chinetcomet"
 
-def send_to_telegram(message):
-    """መረጃውን ወደ ቴሌግራም ቻናሎች ይልካል"""
-    for chat_id in TARGET_CHATS:
-        url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-        payload = {
-            "chat_id": chat_id, 
-            "text": message, 
-            "parse_mode": "Markdown"
-        }
-        try:
-            requests.post(url, json=payload, timeout=15)
-        except Exception as e:
-            print(f"Error: {e}")
+def send_to_telegram(chat_id, message, reply_markup=None):
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": message,
+        "parse_mode": "Markdown",
+        "reply_markup": reply_markup
+    }
+    try:
+        return requests.post(url, json=payload, timeout=15).json()
+    except:
+        return None
 
 @app.route('/')
 def index():
@@ -32,44 +35,67 @@ def submit():
         data = request.get_json(force=True)
         form_type = data.get('type')
         
-        # 1. መኪና ፈላጊ (አስጫኝ)
         if form_type == 'load':
-            msg = (f"🚚 *አዲስ የጭነት ጥያቄ (መኪና ፈላጊ)*\n\n"
-                   f"👤 *ባለቤት/ድርጅት:* {data.get('org', '---')}\n"
-                   f"📞 *ስልክ:* {data.get('phone', '---')}\n"
-                   f"📍 *መነሻ ቦታ:* {data.get('from', '---')}\n"
-                   f"🏁 *መድረሻ ቦታ:* {data.get('to', '---')}\n"
-                   f"📦 *የጭነት አይነት:* {data.get('cargo', '---')}\n"
-                   f"⚖️ *የጭነት መጠን:* {data.get('amount', '---')}\n"
-                   f"🚛 *የሚፈለግ መኪና:* {data.get('truckType', '---')}\n"
-                   f"💰 *የሚከፈል ዋጋ:* {data.get('price', '---')}\n"
-                   f"📅 *የመጫኛ ቀን:* {data.get('date', '---')}")
-
-        # 2. ጭነት ፈላጊ (ሹፌር)
-        elif form_type == 'truck':
-            msg = (f"🚛 *ጭነት እፈልጋለሁ (ከሹፌር)*\n\n"
-                   f"🚐 *የመኪና አይነት:* {data.get('vType', '---')}\n"
-                   f"📍 *አሁን ያለበት:* {data.get('currentCity', '---')}\n"
-                   f"🏁 *መጫን የሚፈልገው:* {data.get('targetCity', '---')}\n\n"
-                   f"👤 *አሽከርካሪ:* {data.get('driverName', '---')}\n"
-                   f"📞 *ስልክ:* {data.get('driverPhone', '---')}\n"
-                   f"👥 *ረዳት:* {data.get('helperName', '---')}\n"
-                   f"📞 *የረዳት ስልክ:* {data.get('helperPhone', '---')}")
-        
-        # 3. አጠቃላይ ሹፌር ምዝገባ
+            msg = (f"🚚 *አዲስ የጭነት ጥያቄ*\n"
+                   f"👤 ድርጅት: {data.get('org', '---')}\n"
+                   f"📞 ስልክ: {data.get('phone', '---')}\n"
+                   f"📍 መነሻ: {data.get('from', '---')}\n"
+                   f"🏁 መድረሻ: {data.get('to', '---')}\n"
+                   f"📦 አይነት: {data.get('cargo', '---')}\n"
+                   f"⚖️ መጠን: {data.get('amount', '---')}\n"
+                   f"🚛 መኪና: {data.get('truckType', '---')}\n"
+                   f"💰 ዋጋ: {data.get('price', '---')}\n"
+                   f"📅 ቀን: {data.get('date', '---')}")
         else:
-            msg = (f"🚐 *አዲስ የሹፌር ምዝገባ*\n\n"
-                   f"👤 *ሹፌር:* {data.get('dName', '---')}\n"
-                   f"📞 *ስልክ:* {data.get('dPhone', '---')}\n"
-                   f"🔢 *ሰሌዳ:* {data.get('plate', '---')}\n"
-                   f"🚛 *አይነት:* {data.get('vType', '---')}")
+            msg = (f"🚛 *ጭነት እፈልጋለሁ (ሹፌር)*\n"
+                   f"🚐 መኪና: {data.get('vType', '---')}\n"
+                   f"📍 ያለበት: {data.get('currentCity', '---')}\n"
+                   f"🏁 የሚፈልገው: {data.get('targetCity', '---')}\n"
+                   f"👤 ሹፌር: {data.get('driverName', '---')}\n"
+                   f"📞 ስልክ: {data.get('driverPhone', '---')}\n"
+                   f"👥 ረዳት: {data.get('helperName', '---')}\n"
+                   f"📞 ረዳት ስልክ: {data.get('helperPhone', '---')}")
 
-        send_to_telegram(msg)
-        return jsonify({"status": "success", "message": "መረጃው በተሳካ ሁኔታ ተልኳል!"})
-
+        markup = {
+            "inline_keyboard": [[
+                {"text": "✅ Approve", "callback_data": "approve_post"},
+                {"text": "❌ Reject", "callback_data": "reject_post"}
+            ]]
+        }
+        send_to_telegram(ADMIN_ID, f"⚠️ *አዲስ ጥያቄ መጥቷል!*\n\n{msg}", markup)
+        return jsonify({"status": "success", "message": "መረጃው ተልኳል፤ አድሚን ሲያጸድቀው ይለጠፋል።"})
     except Exception as e:
-        print(f"DEBUG: Server Error: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
+
+def bot_polling():
+    last_update_id = 0
+    while True:
+        try:
+            url = f"https://api.telegram.org/bot{BOT_TOKEN}/getUpdates?offset={last_update_id + 1}&timeout=20"
+            updates = requests.get(url).json()
+            if "result" in updates:
+                for update in updates["result"]:
+                    last_update_id = update["update_id"]
+                    if "callback_query" in update:
+                        cb = update["callback_query"]
+                        raw_text = cb["message"]["text"].replace("⚠️ አዲስ ጥያቄ መጥቷል!\n\n", "")
+                        
+                        if cb["data"] == "approve_post":
+                            lines = raw_text.split('\n')
+                            filtered = [l for l in lines if not any(x in l for x in ["📞 ስልክ", "👤 ሹፌር", "👤 ድርጅት", "👥 ረዳት", "📞 ረዳት ስልክ"])]
+                            final_post = "\n".join(filtered) + f"\n\n📩 *መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ*👇"
+                            agent_markup = {"inline_keyboard": [[{"text": "👤 Contact Agent", "url": f"https://t.me/{AGENT_USERNAME}"}]]}
+                            
+                            send_to_telegram(CHANNEL_ID, final_post, agent_markup)
+                            send_to_telegram(GROUP_ID, final_post, agent_markup)
+                            requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
+                                          json={"chat_id": ADMIN_ID, "message_id": cb["message"]["message_id"], "text": f"✅ ተለጥፏል\n\n{raw_text}"})
+                        elif cb["data"] == "reject_post":
+                            requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
+                                          json={"chat_id": ADMIN_ID, "message_id": cb["message"]["message_id"], "text": f"❌ ውድቅ ተደርጓል\n\n{raw_text}"})
+        except: pass
+
+threading.Thread(target=bot_polling, daemon=True).start()
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
