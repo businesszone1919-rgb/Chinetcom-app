@@ -14,16 +14,9 @@ AGENT_USERNAME = "chinetcomet"
 
 def send_to_telegram(chat_id, message, reply_markup=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
-    payload = {
-        "chat_id": chat_id,
-        "text": message,
-        "parse_mode": "Markdown",
-        "reply_markup": reply_markup
-    }
-    try:
-        return requests.post(url, json=payload, timeout=15).json()
-    except:
-        return None
+    payload = {"chat_id": chat_id, "text": message, "parse_mode": "Markdown", "reply_markup": reply_markup}
+    try: return requests.post(url, json=payload, timeout=15).json()
+    except: return None
 
 @app.route('/')
 def index():
@@ -37,10 +30,10 @@ def submit():
         
         if form_type == 'load':
             msg = (f"🚚 *አዲስ የጭነት ጥያቄ*\n"
-                   f"👤 ድርጅት: {data.get('org', '---')}\n"
+                   f"👤 የጭነት ባለቤት: {data.get('org', '---')}\n"
                    f"📞 ስልክ: {data.get('phone', '---')}\n"
-                   f"📍 መነሻ: {data.get('from', '---')}\n"
-                   f"🏁 መድረሻ: {data.get('to', '---')}\n"
+                   f"📍 የጭነት መነሻ: {data.get('from', '---')}\n"
+                   f"🏁 የጭነት መድረሻ: {data.get('to', '---')}\n"
                    f"📦 አይነት: {data.get('cargo', '---')}\n"
                    f"⚖️ መጠን: {data.get('amount', '---')}\n"
                    f"🚛 መኪና: {data.get('truckType', '---')}\n"
@@ -49,19 +42,15 @@ def submit():
         else:
             msg = (f"🚛 *ጭነት እፈልጋለሁ (ሹፌር)*\n"
                    f"🚐 መኪና: {data.get('vType', '---')}\n"
+                   f"🔢 ታርጋ: {data.get('plate', '---')}\n"
                    f"📍 ያለበት: {data.get('currentCity', '---')}\n"
-                   f"🏁 የሚፈልገው: {data.get('targetCity', '---')}\n"
+                   f"🏁 መዳረሻ: {data.get('targetCity', '---')}\n"
                    f"👤 ሹፌር: {data.get('driverName', '---')}\n"
                    f"📞 ስልክ: {data.get('driverPhone', '---')}\n"
                    f"👥 ረዳት: {data.get('helperName', '---')}\n"
                    f"📞 ረዳት ስልክ: {data.get('helperPhone', '---')}")
 
-        markup = {
-            "inline_keyboard": [[
-                {"text": "✅ Approve", "callback_data": "approve_post"},
-                {"text": "❌ Reject", "callback_data": "reject_post"}
-            ]]
-        }
+        markup = {"inline_keyboard": [[{"text": "✅ Approve", "callback_data": "approve_post"},{"text": "❌ Reject", "callback_data": "reject_post"}]]}
         send_to_telegram(ADMIN_ID, f"⚠️ *አዲስ ጥያቄ መጥቷል!*\n\n{msg}", markup)
         return jsonify({"status": "success", "message": "መረጃው ተልኳል፤ አድሚን ሲያጸድቀው ይለጠፋል።"})
     except Exception as e:
@@ -82,7 +71,8 @@ def bot_polling():
                         
                         if cb["data"] == "approve_post":
                             lines = raw_text.split('\n')
-                            filtered = [l for l in lines if not any(x in l for x in ["📞 ስልክ", "👤 ሹፌር", "👤 ድርጅት", "👥 ረዳት", "📞 ረዳት ስልክ"])]
+                            # ታርጋ፣ ስምና ስልክን የማጣራት ስራ
+                            filtered = [l for l in lines if not any(x in l for x in ["📞 ስልክ", "👤 ሹፌር", "👤 የጭነት ባለቤት", "👥 ረዳት", "📞 ረዳት ስልክ", "🔢 ታርጋ"])]
                             final_post = "\n".join(filtered) + f"\n\n📩 *መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ*👇"
                             agent_markup = {"inline_keyboard": [[{"text": "👤 Contact Agent", "url": f"https://t.me/{AGENT_USERNAME}"}]]}
                             
