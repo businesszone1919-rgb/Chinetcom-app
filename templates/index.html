@@ -5,45 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chinet Com Logistics</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #f5af19, #f12711); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 15px; }
-        .container { width: 100%; max-width: 450px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 15px; color: white; }
+        .container { width: 100%; max-width: 480px; }
         
-        /* የሜኑ ዲዛይን */
+        /* ዋና ሜኑ */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .menu-btn { background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); padding: 25px 10px; border-radius: 15px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .menu-btn:hover { background: rgba(255, 255, 255, 0.4); transform: translateY(-3px); }
-        .menu-btn span { display: block; font-size: 30px; margin-bottom: 10px; }
+        .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 25px 10px; border-radius: 20px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
+        .menu-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.03); }
+        .menu-btn span { display: block; font-size: 35px; margin-bottom: 10px; }
+
+        /* የምርጫ ገጽ (Sub-menu) */
+        .choice-card { background: white; padding: 30px 20px; border-radius: 25px; display: none; text-align: center; }
+        .choice-btn { width: 100%; padding: 20px; margin: 10px 0; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-load { background: #f39c12; }
+        .btn-truck { background: #2980b9; }
 
         /* የፎርም ካርድ */
-        .card { background: white; padding: 20px; border-radius: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-        .card h2 { color: #1a73e8; text-align: center; margin-top: 0; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 15px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; margin-top: 10px; }
-        .back-btn { background: #6c757d; margin-top: 10px; }
+        .card { background: white; padding: 20px; border-radius: 25px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #333; }
+        .card h2 { color: #1a73e8; text-align: center; margin-bottom: 20px; font-size: 22px; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        .submit-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+        .back-btn { background: #e74c3c; margin-top: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div id="mainMenu" class="menu-grid">
-            <div class="menu-btn" onclick="showForm()">
-                <span>📝</span> Register (መዝግብ)
-            </div>
-            <div class="menu-btn" onclick="copyInviteLink()">
-                <span>🔗</span> Invite (ጋብዝ)
-            </div>
-            <div class="menu-btn" onclick="alert('መመሪያ፡ እዚህ ጋር የአጠቃቀም መመሪያ መጻፍ ትችላለህ')">
-                <span>📖</span> Instruction
-            </div>
-            <div class="menu-btn" onclick="location.reload()">
-                <span>🔄</span> Start (እንደገና)
-            </div>
+            <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
+            <div class="menu-btn" onclick="copyInviteLink()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
+            <div class="menu-btn" onclick="alert('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ። ከዚያ አስጫኝ ከሆኑ - መኪና እፈልጋለሁ፣ ሹፌር ከሆኑ - ጭነት እፈልጋለሁ የሚለውን በመምረጥ መረጃዎን ይሙሉ!')"><span>📖</span> Instruction</div>
+            <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
-        <div id="registrationForm" class="card">
-            <h2>🚚 የጭነት ጥያቄ ማቅረቢያ</h2>
+        <div id="choicePage" class="choice-card">
+            <h2 style="color: #333;">ምን መመዝገብ ይፈልጋሉ?</h2>
+            <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ (አስጫኝ)</button>
+            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ (ሹፌር)</button>
+            <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
+        </div>
+
+        <div id="loadForm" class="card">
+            <h2>📦 መኪና መፈለጊያ ፎርም</h2>
             <input type="text" id="org" placeholder="የባለቤት ወይም የድርጅት ስም">
-            <input type="tel" id="phone" placeholder="የስልክ ቁጥር"> 
+            <input type="tel" id="phone" placeholder="የስልክ ቁጥር">
             <input type="text" id="from" placeholder="መነሻ ቦታ">
             <input type="text" id="to" placeholder="መድረሻ ቦታ">
             <input type="text" id="cargo" placeholder="የጭነቱ አይነት">
@@ -53,64 +58,88 @@
                 <option value="አይሱዙ">አይሱዙ</option>
                 <option value="FSR">FSR</option>
                 <option value="ሲኖትራክ">ሲኖትራክ</option>
+                <option value="ሌላ">ሌላ</option>
             </select>
-            <input type="text" id="price" placeholder="የሚከፈል ዋጋ/ታሪፍ">
+            <input type="text" id="price" placeholder="የሚከፈል ዋጋ (ታሪፍ)">
             <input type="text" id="date" placeholder="የመጫኛ ቀን">
-            
-            <button class="submit-btn" onclick="submitLoad()">ጥያቄውን ላክ</button>
-            <button class="submit-btn back-btn" onclick="showMenu()">ወደ ኋላ ተመለስ</button>
+            <button class="submit-btn" onclick="submitData('load')">ጥያቄውን ላክ</button>
+            <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
+        </div>
+
+        <div id="truckForm" class="card">
+            <h2>🚛 ጭነት መፈለጊያ ፎርም</h2>
+            <select id="vType">
+                <option value="">የመኪናው አይነት</option>
+                <option value="FSR">FSR</option>
+                <option value="ሲኖትራክ">ሲኖትራክ</option>
+                <option value="አይሱዙ">አይሱዙ</option>
+                <option value="ካሶኒ">ካሶኒ</option>
+                <option value="ሌላ">ሌላ</option>
+            </select>
+            <input type="text" id="currentCity" placeholder="መኪናው አሁን ያለበት ከተማ">
+            <input type="text" id="targetCity" placeholder="መጫን የሚፈልጉበት ከተማ">
+            <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
+            <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ ቁጥር">
+            <input type="text" id="helperName" placeholder="የረዳት ስም">
+            <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ ቁጥር">
+            <button class="submit-btn" onclick="submitData('truck')">ምዝገባውን ላክ</button>
+            <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
     </div>
 
     <script>
-        // ሜኑውን እና ፎርሙን መቀያየሪያ
-        function showForm() {
-            document.getElementById('mainMenu').style.display = 'none';
-            document.getElementById('registrationForm').style.display = 'block';
+        function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'grid'; }
+        function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
+        function hideAll() { 
+            document.getElementById('mainMenu').style.display = 'none'; 
+            document.getElementById('choicePage').style.display = 'none';
+            document.getElementById('loadForm').style.display = 'none';
+            document.getElementById('truckForm').style.display = 'none';
         }
 
-        function showMenu() {
-            document.getElementById('registrationForm').style.display = 'none';
-            document.getElementById('mainMenu').style.display = 'grid';
+        function openForm(type) {
+            hideAll();
+            if(type === 'load') document.getElementById('loadForm').style.display = 'block';
+            else document.getElementById('truckForm').style.display = 'block';
         }
 
         function copyInviteLink() {
-            const url = window.location.href;
-            navigator.clipboard.writeText("Chinet Com ላይ ለመመዝገብ ይህንን ሊንክ ይጠቀሙ፡ " + url);
+            navigator.clipboard.writeText("Chinet Com Logistics: " + window.location.href);
             alert("የመጋበዣ ሊንኩ ኮፒ ተደርጓል!");
         }
 
-        async function submitLoad() {
-            const data = {
-                type: 'load',
-                org: document.getElementById('org').value,
-                phone: document.getElementById('phone').value,
-                from: document.getElementById('from').value,
-                to: document.getElementById('to').value,
-                cargo: document.getElementById('cargo').value,
-                amount: document.getElementById('amount').value,
-                truckType: document.getElementById('truckType').value,
-                price: document.getElementById('price').value,
-                date: document.getElementById('date').value
-            };
-
-            if(!data.phone || !data.from) {
-                alert("እባክዎ ስልክ እና መነሻ ቦታ ይሙሉ!");
-                return;
+        async function submitData(type) {
+            let payload = { type: type };
+            if(type === 'load') {
+                payload.org = document.getElementById('org').value;
+                payload.phone = document.getElementById('phone').value;
+                payload.from = document.getElementById('from').value;
+                payload.to = document.getElementById('to').value;
+                payload.cargo = document.getElementById('cargo').value;
+                payload.amount = document.getElementById('amount').value;
+                payload.truckType = document.getElementById('truckType').value;
+                payload.price = document.getElementById('price').value;
+                payload.date = document.getElementById('date').value;
+            } else {
+                payload.vType = document.getElementById('vType').value;
+                payload.currentCity = document.getElementById('currentCity').value;
+                payload.targetCity = document.getElementById('targetCity').value;
+                payload.driverName = document.getElementById('driverName').value;
+                payload.driverPhone = document.getElementById('driverPhone').value;
+                payload.helperName = document.getElementById('helperName').value;
+                payload.helperPhone = document.getElementById('helperPhone').value;
             }
 
             try {
                 const resp = await fetch('/submit', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(payload)
                 });
                 const res = await resp.json();
                 alert(res.message);
-                if(res.status === 'success') showMenu();
-            } catch (e) {
-                alert("ስህተት ተከስቷል!");
-            }
+                if(res.status === 'success') showHome();
+            } catch (e) { alert("ስህተት ተከስቷል!"); }
         }
     </script>
 </body>
