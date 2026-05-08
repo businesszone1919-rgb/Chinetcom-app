@@ -31,7 +31,7 @@
         <div id="mainMenu" class="menu-grid">
             <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
             <div class="menu-btn" onclick="shareApp()"><span>🔗</span> Share<br>(አጋራ)</div>
-            <div class="menu-btn" onclick="alert('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ። ከዚያ አስጫኝ ከሆኑ - መኪና እፈልጋለሁ፣ ሹፌር ከሆኑ - ጭነት እፈልጋለሁ የሚለውን በመምረጥ መረጃዎን ይሙሉ!')"><span>📖</span> Instruction</div>
+            <div class="menu-btn" onclick="showInstruction()"><span>📖</span> Instruction</div>
             <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
@@ -98,7 +98,16 @@
         function hideAll() { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('choicePage').style.display = 'none'; document.getElementById('loadForm').style.display = 'none'; document.getElementById('truckForm').style.display = 'none'; }
         function openForm(type) { hideAll(); if(type === 'load') document.getElementById('loadForm').style.display = 'block'; else document.getElementById('truckForm').style.display = 'block'; }
 
-        // ምስሉ ላይ እንደሚታየው ሁሉንም ፕላትፎርሞች የሚያመጣ ማጋሪያ
+        // አጠቃላይ መመሪያ
+        function showInstruction() {
+            const msg = `🚛 Chinet Com Logistics መመሪያ፡\n\n` +
+                        `1. መዝግብ (Register)፡ መኪና እፈልጋለሁ (አስጫኝ) ወይም ጭነት እፈልጋለሁ (ሹፌር) የሚለውን በመምረጥ መረጃዎን ይሙሉ。\n\n` +
+                        `2. መዳረሻ (Destination)፡ መዳረሻዎ በውል ካልታወቀ "በአስጫኙ ጥያቄ ወይም በስምምነት" የሚለውን እንደነበረ ይተውት።\n\n` +
+                        `3. አጋራ (Share)፡ የቦቱን ሊንክ ለሌሎች ለማጋራት Share የሚለውን ይጠቀሙ።\n\n` +
+                        `4. ቻናልና ግሩፕ፡ በፎርሙ ግርጌ ያሉትን ሊንኮች በመጫን የቴሌግራም ቻናላችንን ይቀላቀሉ።`;
+            alert(msg);
+        }
+
         async function shareApp() {
             const botLink = "https://t.me/chinetcombot";
             if (navigator.share) {
