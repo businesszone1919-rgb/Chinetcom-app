@@ -6,6 +6,7 @@
     <title>Chinet Com Logistics</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 15px; color: white; }
+        
         /* የፎርሙ ስፋት እንዲቀንስ ተደርጓል */
         .container { width: 100%; max-width: 420px; }
         
@@ -28,7 +29,7 @@
         .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 17px; cursor: pointer; margin-top: 10px; font-weight: bold; }
         .back-btn { background: #e74c3c; margin-top: 8px; }
 
-        /* አዲስ የተጨመሩ የሊንክ አዝራሮች */
+        /* የታችኛው ሊንኮች ስታይል */
         .extra-links { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; }
         .extra-links p { font-size: 13px; color: #666; margin-bottom: 10px; font-weight: bold; }
         .link-btn { display: inline-block; padding: 8px 12px; margin: 4px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: bold; color: white; }
@@ -139,9 +140,16 @@
             else document.getElementById('truckForm').style.display = 'block';
         }
 
+        // የቦት ሊንክን ኮፒ የሚያደርግ ተግባር
         function copyInviteLink() {
-            navigator.clipboard.writeText("Chinet Com Logistics: " + window.location.href);
-            alert("የመጋበዣ ሊንኩ ኮፒ ተደርጓል!");
+            const botLink = "https://t.me/chinetcombot";
+            const textToCopy = "Chinet Com Logistics ቦትን ተጠቅመው ጭነት ወይም መኪና በቀላሉ ያግኙ፦ " + botLink;
+            
+            navigator.clipboard.writeText(textToCopy).then(function() {
+                alert("የቦቱ መጋበዣ ሊንክ ኮፒ ተደርጓል!");
+            }, function() {
+                alert("ሊንኩን ኮፒ ማድረግ አልተቻለም።");
+            });
         }
 
         async function submitData(type) {
