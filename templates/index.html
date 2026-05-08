@@ -38,7 +38,7 @@
         <div id="choicePage" class="choice-card">
             <h2>ምን መመዝገብ ይፈልጋሉ?</h2>
             <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ (አስጫኝ)</button>
-            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ (ሹፌር)</button>
+            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ (ጫኝ)</button>
             <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
         </div>
 
@@ -98,13 +98,20 @@
         function hideAll() { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('choicePage').style.display = 'none'; document.getElementById('loadForm').style.display = 'none'; document.getElementById('truckForm').style.display = 'none'; }
         function openForm(type) { hideAll(); if(type === 'load') document.getElementById('loadForm').style.display = 'block'; else document.getElementById('truckForm').style.display = 'block'; }
 
-        // አጠቃላይ መመሪያ
         function showInstruction() {
-            const msg = `🚛 Chinet Com Logistics መመሪያ፡\n\n` +
-                        `1. መዝግብ (Register)፡ መኪና እፈልጋለሁ (አስጫኝ) ወይም ጭነት እፈልጋለሁ (ሹፌር) የሚለውን በመምረጥ መረጃዎን ይሙሉ。\n\n` +
-                        `2. መዳረሻ (Destination)፡ መዳረሻዎ በውል ካልታወቀ "በአስጫኙ ጥያቄ ወይም በስምምነት" የሚለውን እንደነበረ ይተውት።\n\n` +
-                        `3. አጋራ (Share)፡ የቦቱን ሊንክ ለሌሎች ለማጋራት Share የሚለውን ይጠቀሙ።\n\n` +
-                        `4. ቻናልና ግሩፕ፡ በፎርሙ ግርጌ ያሉትን ሊንኮች በመጫን የቴሌግራም ቻናላችንን ይቀላቀሉ።`;
+            const msg = `እንኳን ወደ Chinet Com Logistics በደህና መጡ! ይህ መድረክ አስጫኞችን(የጭነት ባለንብረቶችን) እና ጫኞችን (መኪኖችን) በቀላሉ የሚያገናኝ የዲጂታል የጭነት አገልግሎት ማዕከል ነው። አጠቃቀሙም:-\n\n` +
+                        `1. መመዝገብ (Register)\n` +
+                        `አገልግሎቱን ለመጠቀም መጀመሪያ በዋናው ገጽ ላይ ያለውን "Register (መዝግብ)" የሚለውን ቁልፍ ይጫኑ። ከዚያም እንደ ፍላጎትዎ ከሚከተሉት አንዱን ይምረጡ፦\n` +
+                        `📦 መኪና እፈልጋለሁ (አስጫኝ ከሆኑ)፦ የጭነት አይነት፣ መነሻ እና መድረሻ ቦታ፣ የሚፈለጉትን የመኪና አይነት እና ዋጋ... በመሙላት ጥያቄዎን ያቅርቡ።\n` +
+                        `🚛 ጭነት እፈልጋለሁ (ጫኝ ከሆኑ)፦ የመኪናዎን አይነት፣ ታርጋ፣ አሁን ያሉበትን ከተማ እና መሄድ የሚፈልጉበትን (መዳረሻ) ወዘተ... በመሙላት ይመዝገቡ።\n\n` +
+                        `2. መዳረሻ (Destination)\n` +
+                        `በምዝገባ ወቅት መዳረሻዎ በውል ካልታወቀ ወይም ከአስጫኙ ጋር ለመስማማት ከፈለጉ፣ በሳጥኑ ውስጥ ተሞልቶ የሚገኘውን "በአስጫኙ ጥያቄ ወይም በስምምነት" የሚለውን ጽሑፍ እንዳለ መተው ይችላሉ። የተወሰነ ቦታ ካለዎት ግን አጥፍተው መዳረሻዎን መጻፍ ይችላሉ።\n\n` +
+                        `3. አጋራ (Share)\n` +
+                        `ብዙ አማራጮችን ለማግኘት እና መድረኩን ለማሳደግ በዋናው ገጽ ላይ ያለውን "Share (አጋራ)" የሚለውን ቁልፍ በመጫን ለጓደኞችዎ፣ ለጭነት ፈላጊዎች፣ ለሾፌሮች፣ ለነጋዴዎች ወዘተ... ሊንኩን በቴሌግራም፣ በዋትስአፕ እና በፌስቡክ ግሩፖች ላይ መላክ ወይም ማሰራጨት ይችላሉ።\n\n` +
+                        `4. ተጨማሪ መረጃ ለማግኘት\n` +
+                        `ሁልጊዜ አዳዲስ የጭነት ጥያቄዎችን እና የሚገኙ መኪናዎችን በቅርብ ለመከታተል በፎርሙ ግርጌ የሚገኙትን ሊንኮች ማለትም፦ Join Channel እና Join Group በመጫን የሚፈልጉትን መኪና ወይም የሚፈልጉትን ጭነት ማግኜት ይችላሉ።\n\n` +
+                        `5. እንደገና ለመጀመር\n` +
+                        `ማንኛውም ስህተት ቢሠሩ ወይም ወደ ዋናው ገጽ መመለስ ቢፈልጉ "Start (እንደገና)" የሚለውን ቁልፍ በመጫን ገጹን ማደስ ይችላሉ።`;
             alert(msg);
         }
 
@@ -114,7 +121,7 @@
                 try {
                     await navigator.share({
                         title: 'Chinet Com Logistics',
-                        text: 'በዚህ ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ!',
+                        text: 'በ Chinet Com Logistics ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ!',
                         url: botLink
                     });
                 } catch (err) {
