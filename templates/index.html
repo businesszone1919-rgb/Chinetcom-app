@@ -7,23 +7,19 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 15px; color: white; }
         .container { width: 100%; max-width: 480px; }
-        
-        /* ዋና ሜኑ */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 25px 10px; border-radius: 20px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
         .menu-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.03); }
         .menu-btn span { display: block; font-size: 35px; margin-bottom: 10px; }
-
-        /* የምርጫ ገጽ (Sub-menu) */
         .choice-card { background: white; padding: 30px 20px; border-radius: 25px; display: none; text-align: center; }
         .choice-btn { width: 100%; padding: 20px; margin: 10px 0; border-radius: 15px; border: none; font-size: 18px; font-weight: bold; cursor: pointer; color: white; }
         .btn-load { background: #f39c12; }
         .btn-truck { background: #2980b9; }
-
-        /* የፎርም ካርድ */
         .card { background: white; padding: 20px; border-radius: 25px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5); color: #333; }
         .card h2 { color: #1a73e8; text-align: center; margin-bottom: 20px; font-size: 22px; }
         input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
+        .hint { font-size: 12px; color: #e67e22; font-weight: bold; display: block; margin-bottom: 10px; }
+        .other-input { display: none; }
         .submit-btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 18px; cursor: pointer; margin-top: 15px; font-weight: bold; }
         .back-btn { background: #e74c3c; margin-top: 10px; }
     </style>
@@ -46,21 +42,26 @@
         </div>
 
         <div id="loadForm" class="card">
-            <h2>📦 መኪና መፈለጊያ ፎርም</h2>
-            <input type="text" id="org" placeholder="የባለቤት ወይም የድርጅት ስም">
+            <h2>📦 የጭነት ጥያቄ ማቅረቢያ</h2>
+            <input type="text" id="org" placeholder="የጭነት የባለቤቱ ወይም የድርጅቱ ስም">
             <input type="tel" id="phone" placeholder="የስልክ ቁጥር">
-            <input type="text" id="from" placeholder="መነሻ ቦታ">
-            <input type="text" id="to" placeholder="መድረሻ ቦታ">
+            <input type="text" id="from" placeholder="የጭነት መነሻ ቦታ">
+            <input type="text" id="to" placeholder="የጭነት መድረሻ ቦታ">
             <input type="text" id="cargo" placeholder="የጭነቱ አይነት">
             <input type="text" id="amount" placeholder="መጠን (ኩንታል/ቶን)">
-            <select id="truckType">
+            
+            <select id="truckType" onchange="toggleOther('truckType', 'otherTruck')">
                 <option value="">የሚፈለገው መኪና አይነት</option>
                 <option value="አይሱዙ">አይሱዙ</option>
                 <option value="FSR">FSR</option>
                 <option value="ሲኖትራክ">ሲኖትራክ</option>
-                <option value="ሌላ">ሌላ</option>
+                <option value="ሌላ">ሌላ ጥቀስ</option>
             </select>
-            <input type="text" id="price" placeholder="የሚከፈል ዋጋ (ታሪፍ)">
+            <input type="text" id="otherTruck" class="other-input" placeholder="የመኪናውን አይነት እዚህ ይጥቀሱ">
+
+            <input type="text" id="price" placeholder="ዋጋ - በኩንታል/ቶን">
+            <span class="hint">ድርድር አለው</span>
+            
             <input type="text" id="date" placeholder="የመጫኛ ቀን">
             <button class="submit-btn" onclick="submitData('load')">ጥያቄውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
@@ -68,7 +69,7 @@
 
         <div id="truckForm" class="card">
             <h2>🚛 ጭነት መፈለጊያ ፎርም</h2>
-            <select id="vType">
+            <select id="vType" onchange="toggleOther('vType', 'otherVType')">
                 <option value="">የመኪናው አይነት</option>
                 <option value="FSR">FSR</option>
                 <option value="ሲኖትራክ">ሲኖትራክ</option>
@@ -76,18 +77,29 @@
                 <option value="ካሶኒ">ካሶኒ</option>
                 <option value="ሌላ">ሌላ</option>
             </select>
+            <input type="text" id="otherVType" class="other-input" placeholder="የመኪናውን አይነት እዚህ ይጻፉ">
+            
+            <input type="text" id="plate" placeholder="ታርጋ ቁጥር ኮድ ጨምሮ">
             <input type="text" id="currentCity" placeholder="መኪናው አሁን ያለበት ከተማ">
-            <input type="text" id="targetCity" placeholder="መጫን የሚፈልጉበት ከተማ">
+            <input type="text" id="targetCity" value="በስምምነት" placeholder="የጭነቱ መዳረሻ ቦታ">
+            
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ ቁጥር">
             <input type="text" id="helperName" placeholder="የረዳት ስም">
             <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ ቁጥር">
+            
             <button class="submit-btn" onclick="submitData('truck')">ምዝገባውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
     </div>
 
     <script>
+        function toggleOther(selectId, inputId) {
+            const select = document.getElementById(selectId);
+            const input = document.getElementById(inputId);
+            input.style.display = (select.value === 'ሌላ') ? 'block' : 'none';
+        }
+
         function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'grid'; }
         function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
         function hideAll() { 
@@ -117,11 +129,14 @@
                 payload.to = document.getElementById('to').value;
                 payload.cargo = document.getElementById('cargo').value;
                 payload.amount = document.getElementById('amount').value;
-                payload.truckType = document.getElementById('truckType').value;
+                let tType = document.getElementById('truckType').value;
+                payload.truckType = (tType === 'ሌላ') ? document.getElementById('otherTruck').value : tType;
                 payload.price = document.getElementById('price').value;
                 payload.date = document.getElementById('date').value;
             } else {
-                payload.vType = document.getElementById('vType').value;
+                let vType = document.getElementById('vType').value;
+                payload.vType = (vType === 'ሌላ') ? document.getElementById('otherVType').value : vType;
+                payload.plate = document.getElementById('plate').value;
                 payload.currentCity = document.getElementById('currentCity').value;
                 payload.targetCity = document.getElementById('targetCity').value;
                 payload.driverName = document.getElementById('driverName').value;
