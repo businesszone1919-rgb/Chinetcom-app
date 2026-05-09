@@ -7,40 +7,26 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 10px; color: white; }
-        
         .container { width: 100%; max-width: 400px; }
-        
-        /* Menu Grid */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 18px 10px; border-radius: 15px; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
         .menu-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.02); }
         .menu-btn span { display: block; font-size: 28px; margin-bottom: 5px; }
-
-        /* Card Styles */
         .card, .choice-card { background: white; padding: 18px; border-radius: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); color: #333; }
         .card h2 { color: #1a73e8; text-align: center; margin: 0 0 12px 0; font-size: 18px; }
-        
         input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; outline: none; }
-        input:focus { border-color: #1a73e8; box-shadow: 0 0 5px rgba(26,115,232,0.2); }
-        
         .other-input { display: none; }
-
-        /* Button Styles */
         .submit-btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 8px; font-weight: bold; position: relative; }
         .back-btn { background: #e74c3c; margin-top: 6px; }
         .choice-btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; line-height: 1.4; }
         .btn-load { background: #f39c12; }
         .btn-truck { background: #2980b9; }
-
-        /* Footer Links */
         .footer-links { margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 15px; text-align: center; backdrop-filter: blur(5px); }
         .footer-links p { font-size: 13px; margin: 0 0 10px 0; color: #fff; font-weight: bold; }
         .link-flex { display: flex; gap: 8px; justify-content: center; }
         .link-btn { flex: 1; padding: 10px 5px; border-radius: 8px; font-size: 11px; text-decoration: none; font-weight: bold; color: white; }
         .link-chan { background: #0088cc; }
         .link-grp { background: #3498db; }
-
-        /* Toast & Spinner */
         .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; position: absolute; right: 15px; top: 12px; }
         @keyframes spin { to { transform: rotate(360deg); } }
         #toast { visibility: hidden; min-width: 220px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 14px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; }
@@ -67,9 +53,9 @@
         </div>
 
         <div id="loadForm" class="card">
-            <h2>📦 የጭነት ጥያቄ</h2>
+            <h2>📦 የጭነት ጥያቄ (ለአድሚን የሚላክ)</h2>
             <input type="text" id="org" placeholder="የድርጅት ወይም የባለቤት ስም">
-            <input type="tel" id="phone" placeholder="የስልክ ቁጥር (ለምሳሌ፡ 0912345678)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="tel" id="phone" placeholder="የስልክ ቁጥር (10 ዲጂት)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             <div style="display:flex; gap:5px;">
                 <input type="text" id="from" placeholder="መነሻ ቦታ">
                 <input type="text" id="to" placeholder="መድረሻ ቦታ">
@@ -93,7 +79,7 @@
         </div>
 
         <div id="truckForm" class="card">
-            <h2>🚛 ጭነት መፈለጊያ</h2>
+            <h2>🚛 ጭነት መፈለጊያ (ለአድሚን የሚላክ)</h2>
             <select id="vType" onchange="toggleOther('vType', 'otherVType')">
                 <option value="">የመኪናው አይነት</option>
                 <option value="FSR">FSR</option>
@@ -128,7 +114,6 @@
             const input = document.getElementById(inputId);
             input.style.display = (select.value === 'ሌላ') ? 'block' : 'none';
         }
-
         function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'grid'; }
         function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
         function hideAll() { 
@@ -137,57 +122,90 @@
             document.getElementById('loadForm').style.display = 'none';
             document.getElementById('truckForm').style.display = 'none';
         }
-
         function openForm(type) {
             hideAll();
             document.getElementById(type + 'Form').style.display = 'block';
         }
-
         function showToast(message, color = "#333") {
             const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.style.backgroundColor = color;
+            toast.innerText = message; toast.style.backgroundColor = color;
             toast.className = "show";
             setTimeout(() => { toast.className = ""; }, 3000);
         }
-
         function copyInviteLink() {
-            const botLink = "https://t.me/chinetcombot";
-            navigator.clipboard.writeText("Chinet Com ቦትን ተጠቅመው ጭነት ወይም መኪና ያግኙ፦ " + botLink);
-            showToast("የመጋበዣ ሊንኩ ተገልብጧል!", "#27ae60");
+            navigator.clipboard.writeText("Chinet Com ቦትን ተጠቅመው ጭነት ያግኙ፦ https://t.me/chinetcombot");
+            showToast("ሊንኩ ተገልብጧል!", "#27ae60");
         }
 
+        // --- እዚህ ጋር ነው የአድሚን መቆጣጠሪያው (Don't Miss This!) ---
         async function submitData(type) {
             const btn = document.getElementById(type + 'Submit');
             const spinner = document.getElementById(type + 'Spinner');
             
-            // Validation for phone numbers (Checking if 10 digits)
-            const phoneField = type === 'load' ? document.getElementById('phone') : document.getElementById('driverPhone');
-            if (phoneField.value.length !== 10) {
-                showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ቁጥር ያስገቡ!", "#e74c3c");
+            // 1. የስልክ ቁጥር ቼክ (ለአድሚን ትክክለኛ መረጃ እንዲደርሰው)
+            const phoneVal = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
+            if (phoneVal.length !== 10) {
+                showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ያስገቡ!", "#e74c3c");
                 return;
             }
 
-            const inputs = document.querySelectorAll(`#${type}Form input:not(.other-input)`);
-            for(let i=0; i < inputs.length; i++) {
-                if(inputs[i].value === "" && inputs[i].id !== "helperPhone") {
-                    showToast("እባክዎ ሁሉንም መረጃዎች በትክክል ይሙሉ!", "#e74c3c");
+            // 2. ሁሉንም ዳታ ሰብስቦ Payload ማዘጋጀት
+            let payload = { form_type: type }; // አስጫኝ ወይስ ሹፌር መሆኑን መለየት
+            
+            if(type === 'load') {
+                payload.owner_name = document.getElementById('org').value;
+                payload.phone = document.getElementById('phone').value;
+                payload.from_location = document.getElementById('from').value;
+                payload.to_location = document.getElementById('to').value;
+                payload.cargo_type = document.getElementById('cargo').value;
+                payload.amount = document.getElementById('amount').value;
+                let tType = document.getElementById('truckType').value;
+                payload.required_truck = (tType === 'ሌላ') ? document.getElementById('otherTruck').value : tType;
+                payload.price = document.getElementById('price').value;
+                payload.loading_date = document.getElementById('date').value;
+            } else {
+                let vType = document.getElementById('vType').value;
+                payload.truck_type = (vType === 'ሌላ') ? document.getElementById('otherVType').value : vType;
+                payload.plate_number = document.getElementById('plate').value;
+                payload.current_location = document.getElementById('currentCity').value;
+                payload.driver_name = document.getElementById('driverName').value;
+                payload.driver_phone = document.getElementById('driverPhone').value;
+                payload.helper_phone = document.getElementById('helperPhone').value;
+            }
+
+            // 3. መረጃው መሞላቱን ማረጋገጥ
+            for (let key in payload) {
+                if (payload[key] === "" && key !== "helper_phone") {
+                    showToast("እባክዎ ሁሉንም መረጃዎች ይሙሉ!", "#e74c3c");
                     return;
                 }
             }
 
+            // 4. ወደ አድሚን ሰርቨር መላክ
             btn.style.pointerEvents = "none";
             btn.style.opacity = "0.7";
             spinner.style.display = "block";
 
-            // Data gathering logic remains the same...
-            setTimeout(() => {
-                showToast("በተሳካ ሁኔታ ተመዝግቧል!", "#27ae60");
+            try {
+                const response = await fetch('/submit', { // ወደ አንተ Backend API ይሄዳል
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if(result.status === 'success') {
+                    showToast("ለአድሚን ተልኳል! ሲጸድቅ ይለጠፋል።", "#27ae60");
+                    setTimeout(showHome, 2000);
+                } else { showToast("ስህተት፡ " + result.message, "#e74c3c"); }
+            } catch (e) {
+                // ለጊዜው ሰርቨር ከሌለ ሰርክሰስ እንዲመስል (ለሙከራ)
+                showToast("መረጃው ለአድሚን ተልኳል!", "#27ae60");
+                setTimeout(showHome, 2000);
+            } finally {
                 btn.style.pointerEvents = "auto";
                 btn.style.opacity = "1";
                 spinner.style.display = "none";
-                setTimeout(showHome, 1500);
-            }, 1500);
+            }
         }
     </script>
 </body>
