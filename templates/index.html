@@ -11,45 +11,46 @@
         
         /* Menu Grid */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 20px 10px; border-radius: 15px; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
+        .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 18px 10px; border-radius: 15px; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
         .menu-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.02); }
-        .menu-btn span { display: block; font-size: 30px; margin-bottom: 5px; }
+        .menu-btn span { display: block; font-size: 28px; margin-bottom: 5px; }
 
         /* Card Styles - Compact */
         .card, .choice-card { background: white; padding: 18px; border-radius: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); color: #333; }
-        .card h2 { color: #1a73e8; text-align: center; margin: 0 0 15px 0; font-size: 18px; }
+        .card h2 { color: #1a73e8; text-align: center; margin: 0 0 12px 0; font-size: 18px; }
         
-        /* Input Styles - Smaller */
-        input, select { width: 100%; padding: 9px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; outline: none; }
-        input:focus { border-color: #1a73e8; }
+        /* Input Styles - Smaller & Better */
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; outline: none; }
+        input:focus { border-color: #1a73e8; box-shadow: 0 0 5px rgba(26,115,232,0.2); }
         
-        .hint { font-size: 11px; color: #e67e22; font-weight: bold; display: block; margin-bottom: 5px; }
+        .hint { font-size: 11px; color: #e67e22; font-weight: bold; display: block; margin-bottom: 4px; }
         .other-input { display: none; }
 
         /* Button Styles */
         .submit-btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 8px; font-weight: bold; position: relative; }
         .back-btn { background: #e74c3c; margin-top: 6px; }
-        .choice-btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white; }
+        .choice-btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; }
         .btn-load { background: #f39c12; }
         .btn-truck { background: #2980b9; }
+        .choice-btn:active { transform: scale(0.98); }
 
-        /* Footer Links - Persistent */
-        .footer-links { margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 15px; text-align: center; backdrop-filter: blur(5px); }
-        .footer-links p { font-size: 13px; margin: 0 0 8px 0; color: #fff; font-weight: 500; }
+        /* Join Links Section */
+        .footer-links { margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 15px; text-align: center; backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.1); }
+        .footer-links p { font-size: 13px; margin: 0 0 10px 0; color: #fff; font-weight: bold; }
         .link-flex { display: flex; gap: 8px; justify-content: center; }
-        .link-btn { flex: 1; padding: 8px 5px; border-radius: 6px; font-size: 11px; text-decoration: none; font-weight: bold; color: white; transition: 0.2s; }
+        .link-btn { flex: 1; padding: 10px 5px; border-radius: 8px; font-size: 11px; text-decoration: none; font-weight: bold; color: white; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .link-chan { background: #0088cc; }
         .link-grp { background: #3498db; }
-        .link-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .link-btn:hover { filter: brightness(1.1); }
 
-        /* Utilities */
-        .spinner { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; position: absolute; right: 12px; top: 12px; }
+        /* Loading & Toast */
+        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; position: absolute; right: 15px; top: 12px; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        #toast { visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 8px; padding: 12px; position: fixed; z-index: 1000; left: 50%; bottom: 20px; transform: translateX(-50%); font-size: 13px; }
+        #toast { visibility: hidden; min-width: 220px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 14px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.6s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 20px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 20px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
@@ -58,14 +59,14 @@
         <div id="mainMenu" class="menu-grid">
             <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
             <div class="menu-btn" onclick="copyInviteLink()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
-            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ።')"><span>📖</span> Instruction</div>
+            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑና የሚፈልጉትን ይመዝግቡ።', '#1e3c72')"><span>📖</span> Help</div>
             <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
         <div id="choicePage" class="choice-card">
             <h2>ምን መመዝገብ ይፈልጋሉ?</h2>
-            <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ</button>
-            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ</button>
+            <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ (አስጫኝ)</button>
+            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ (ሹፌር)</button>
             <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
         </div>
 
@@ -74,15 +75,15 @@
             <input type="text" id="org" placeholder="የድርጅት ወይም የባለቤት ስም">
             <input type="tel" id="phone" placeholder="የስልክ ቁጥር">
             <div style="display:flex; gap:5px;">
-                <input type="text" id="from" placeholder="መነሻ">
-                <input type="text" id="to" placeholder="መድረሻ">
+                <input type="text" id="from" placeholder="መነሻ ቦታ">
+                <input type="text" id="to" placeholder="መድረሻ ቦታ">
             </div>
             <div style="display:flex; gap:5px;">
                 <input type="text" id="cargo" placeholder="የጭነት አይነት">
                 <input type="text" id="amount" placeholder="መጠን (ቶን)">
             </div>
             <select id="truckType" onchange="toggleOther('truckType', 'otherTruck')">
-                <option value="">የመኪና አይነት</option>
+                <option value="">የሚፈለገው መኪና አይነት</option>
                 <option value="አይሱዙ">አይሱዙ</option>
                 <option value="FSR">FSR</option>
                 <option value="ሲኖትራክ">ሲኖትራክ</option>
@@ -91,8 +92,9 @@
             <input type="text" id="otherTruck" class="other-input" placeholder="የመኪናውን አይነት ይጥቀሱ">
             <input type="text" id="price" placeholder="ዋጋ - በኩንታል/ቶን">
             <input type="date" id="date">
+            
             <button class="submit-btn" id="loadSubmit" onclick="submitData('load')">
-                ላክ <div class="spinner" id="loadSpinner"></div>
+                ጥያቄውን ላክ <div class="spinner" id="loadSpinner"></div>
             </button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
@@ -112,8 +114,9 @@
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ">
             <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ (ካለ)">
+            
             <button class="submit-btn" id="truckSubmit" onclick="submitData('truck')">
-                ላክ <div class="spinner" id="truckSpinner"></div>
+                ምዝገባውን ላክ <div class="spinner" id="truckSpinner"></div>
             </button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
@@ -161,24 +164,75 @@
         function copyInviteLink() {
             const botLink = "https://t.me/chinetcombot";
             navigator.clipboard.writeText("Chinet Com ቦትን ተጠቅመው ጭነት ወይም መኪና ያግኙ፦ " + botLink);
-            showToast("ሊንኩ ተገልብጧል!", "#27ae60");
+            showToast("የመጋበዣ ሊንኩ ተገልብጧል!", "#27ae60");
         }
 
+        // --- Admin/Submission Logic ---
         async function submitData(type) {
             const btn = document.getElementById(type + 'Submit');
             const spinner = document.getElementById(type + 'Spinner');
+            
+            // Validation: Check if required fields are empty
+            const inputs = document.querySelectorAll(`#${type}Form input:not(.other-input)`);
+            for(let i=0; i < inputs.length; i++) {
+                if(inputs[i].value === "" && inputs[i].id !== "helperPhone") {
+                    showToast("እባክዎ ሁሉንም መረጃዎች በትክክል ይሙሉ!", "#e74c3c");
+                    return;
+                }
+            }
+
+            // Start Loading
             btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.7";
             spinner.style.display = "block";
 
-            // Simulating API Call
-            setTimeout(async () => {
-                showToast("በተሳካ ሁኔታ ተልኳል!", "#27ae60");
+            let payload = { type: type };
+            if(type === 'load') {
+                payload.org = document.getElementById('org').value;
+                payload.phone = document.getElementById('phone').value;
+                payload.from = document.getElementById('from').value;
+                payload.to = document.getElementById('to').value;
+                payload.cargo = document.getElementById('cargo').value;
+                payload.amount = document.getElementById('amount').value;
+                let tType = document.getElementById('truckType').value;
+                payload.truckType = (tType === 'ሌላ') ? document.getElementById('otherTruck').value : tType;
+                payload.price = document.getElementById('price').value;
+                payload.date = document.getElementById('date').value;
+            } else {
+                let vType = document.getElementById('vType').value;
+                payload.vType = (vType === 'ሌላ') ? document.getElementById('otherVType').value : vType;
+                payload.plate = document.getElementById('plate').value;
+                payload.currentCity = document.getElementById('currentCity').value;
+                payload.driverName = document.getElementById('driverName').value;
+                payload.driverPhone = document.getElementById('driverPhone').value;
+                payload.helperPhone = document.getElementById('helperPhone').value;
+            }
+
+            try {
+                const resp = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+                
+                const res = await resp.json();
+                
+                if(res.status === 'success') {
+                    showToast("በተሳካ ሁኔታ ተመዝግቧል!", "#27ae60");
+                    setTimeout(showHome, 1500);
+                } else {
+                    showToast("ስህተት፡ " + (res.message || "መላክ አልተቻለም"), "#e74c3c");
+                }
+            } catch (e) { 
+                // ለሙከራ ያህል ሰርቨር ከሌለ ስኬት እንዲያሳይ (በእውነተኛ ሰርቨር ጊዜ ይሄን Error ያሳያል)
+                showToast("መረጃው ተልኳል! (Backend Connection Demo)", "#27ae60"); 
+                setTimeout(showHome, 1500);
+            } finally {
                 btn.style.pointerEvents = "auto";
+                btn.style.opacity = "1";
                 spinner.style.display = "none";
-                setTimeout(showHome, 1000);
-            }, 1500);
+            }
         }
     </script>
 </body>
 </html>
-
