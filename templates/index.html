@@ -54,7 +54,7 @@
             </select>
             <input type="text" id="price" placeholder="ዋጋ">
             <input type="text" id="date" placeholder="የመጫኛ ቀን">
-            <button class="submit-btn" onclick="submitData('load')">ጥያቄውን ላክ</button>
+            <button class="submit-btn" onclick="submitToAdmin('load')">ጥያቄውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
 
@@ -71,7 +71,7 @@
             <input type="text" id="targetCity" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ">
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ">
-            <button class="submit-btn" onclick="submitData('truck')">ምዝገባውን ላክ</button>
+            <button class="submit-btn" onclick="submitToAdmin('truck')">ምዝገባውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
     </div>
@@ -82,30 +82,35 @@
         function hideAll() { document.getElementById('mainMenu').style.display = 'none'; document.getElementById('choicePage').style.display = 'none'; document.getElementById('loadForm').style.display = 'none'; document.getElementById('truckForm').style.display = 'none'; }
         function openForm(type) { hideAll(); if(type === 'load') document.getElementById('loadForm').style.display = 'block'; else document.getElementById('truckForm').style.display = 'block'; }
 
+        // ባለ 5 ክፍል መመሪያ (አንድም ቃል ሳይቀነስ)
         function showInstruction() {
-            const msg = `እንኳን ወደ Chinet Com Logistics በደህና መጡ! ይህ መድረክ አስጫኞችን(የጭነት ባለንብረቶችን) እና ጫኞችን (መኪኖችን) በቀላሉ የሚያገናኝ የዲጂታል የጭነት አገልግሎት ማዕከል ነው። አጠቃቀሙም:-\n\n1. መመዝገብ (Register)\nአገልግሎቱን ለመጠቀም መጀመሪያ በዋናው ገጽ ላይ ያለውን "Register (መዝግብ)" የሚለውን ቁልፍ ይጫኑ። ከዚያም እንደ ፍላጎትዎ ከሚከተሉት አንዱን ይምረጡ፦\n📦 መኪና እፈልጋለሁ (አስጫኝ ከሆኑ)፦ የጭነት አይነት፣ መነሻ እና መድረሻ ቦታ፣ የሚፈለጉትን የመኪና አይነት እና ዋጋ... በመሙላት ጥያቄዎን ያቅርቡ።\n🚛 ጭነት እፈልጋለሁ (ጫኝ ከሆኑ)፦ የመኪናዎን አይነት፣ ታርጋ፣ አሁን ያሉበትን ከተማ እና መሄድ የሚፈልጉበትን (መዳረሻ) ወዘተ... በመሙላት ይመዝገቡ።\n\n2. መዳረሻ (Destination)\nበምዝገባ ወቅት መዳረሻዎ በውል ካልታወቀ ወይም ከአስጫኙ ጋር ለመስማማት ከፈለጉ፣ በሳጥኑ ውስጥ ተሞልቶ የሚገኘውን "በአስጫኙ ጥያቄ ወይም በስምምነት" የሚለውን ጽሑፍ እንዳለ መተው ይችላሉ። የተወሰነ ቦታ ካለዎት ግን አጥፍተው መዳረሻዎን መጻፍ ይችላሉ።\n\n3. አጋራ (Share)\nብዙ አማራጮችን ለማግኘት እና መድረኩን ለማሳደግ በዋናው ገጽ ላይ ያለውን "Share (አጋራ)" የሚለውን ቁልፍ በመጫን ለጓደኞችዎ፣ ለጭነት ፈላጊዎች፣ ለሾፌሮች፣ ለነጋዴዎች ወዘተ... ሊንኩን በቴሌግራም፣ በዋትስአፕ እና በፌስቡክ ግሩፖች ላይ መላክ ወይም ማሰራጨት ይችላሉ።\n\n4. ተጨማሪ መረጃ ለማግኘት\nሁልጊዜ አዳዲስ የጭነት ጥያቄዎችን እና የሚገኙ መኪናዎችን በቅርብ ለመከታተል በፎርሙ ግርጌ የሚገኙትን ሊንኮች ማለትም፦ Join Channel እና Join Group በመጫን የሚፈልጉትን መኪና ወይም የሚፈልጉትን ጭነት ማግኜት ይችላሉ።\n\n5. እንደገና ለመጀመር\nማንኛውም ስህተት ቢሠሩ ወይም ወደ ዋናው ገጽ መመለስ ቢፈልጉ "Start (እንደገና)" የሚለውን ቁልፍ በመጫን ገጹን ማደስ ይችላሉ።`;
+            const msg = `እንኳን ወደ Chinet Com Logistics በደህና መጡ! ይህ መድረክ አስጫኞችን(የጭነት ባለንብረቶችን) እና ጫኞችን (መኪኖችን) በቀላሉ የሚያገናኝ የዲጂታል የጭነት አገልግሎት ማዕከል ነው። አጠቃቀሙም:-\n\n` +
+                        `1. መመዝገብ (Register)\nአገልግሎቱን ለመጠቀም መጀመሪያ በዋናው ገጽ ላይ ያለውን "Register (መዝግብ)" የሚለውን ቁልፍ ይጫኑ። ከዚያም እንደ ፍላጎትዎ ከሚከተሉት አንዱን ይምረጡ፦\n📦 መኪና እፈልጋለሁ (አስጫኝ ከሆኑ)፦ የጭነት አይነት፣ መነሻ እና መድረሻ ቦታ፣ የሚፈለጉትን የመኪና አይነት እና ዋጋ... በመሙላት ጥያቄዎን ያቅርቡ።\n🚛 ጭነት እፈልጋለሁ (ጫኝ ከሆኑ)፦ የመኪናዎን አይነት፣ ታርጋ፣ አሁን ያሉበትን ከተማ እና መሄድ የሚፈልጉበትን (መዳረሻ) ወዘተ... በመሙላት ይመዝገቡ።\n\n` +
+                        `2. መዳረሻ (Destination)\nበምዝገባ ወቅት መዳረሻዎ በውል ካልታወቀ ወይም ከአስጫኙ ጋር ለመስማማት ከፈለጉ፣ በሳጥኑ ውስጥ ተሞልቶ የሚገኘውን "በአስጫኙ ጥያቄ ወይም በስምምነት" የሚለውን ጽሑፍ እንዳለ መተው ይችላሉ። የተወሰነ ቦታ ካለዎት ግን አጥፍተው መዳረሻዎን መጻፍ ይችላሉ።\n\n` +
+                        `3. አጋራ (Share)\nብዙ አማራጮችን ለማግኘት እና መድረኩን ለማሳደግ በዋናው ገጽ ላይ ያለውን "Share (አጋራ)" የሚለውን ቁልፍ በመጫን ለጓደኞችዎ፣ ለጭነት ፈላጊዎች፣ ለሾፌሮች፣ ለነጋዴዎች ወዘተ... ሊንኩን በቴሌግራም፣ በዋትስአፕ እና በፌስቡክ ግሩፖች ላይ መላክ ወይም ማሰራጨት ይችላሉ።\n\n` +
+                        `4. ተጨማሪ መረጃ ለማግኘት\nሁልጊዜ አዳዲስ የጭነት ጥያቄዎችን እና የሚገኙ መኪናዎችን በቅርብ ለመከታተል በፎርሙ ግርጌ የሚገኙትን ሊንኮች ማለትም፦ Join Channel እና Join Group በመጫን የሚፈልጉትን መኪና ወይም የሚፈልጉትን ጭነት ማግኜት ይችላሉ።\n\n` +
+                        `5. እንደገና ለመጀመር\nማንኛውም ስህተት ቢሠሩ ወይም ወደ ዋናው ገጽ መመለስ ቢፈልጉ "Start (እንደገና)" የሚለውን ቁልፍ በመጫን ገጹን ማደስ ይችላሉ።`;
             alert(msg);
         }
 
-        // የተስተካከለው የ Share ተግባር
+        // የ Share ተግባር (ወደ ቴሌግራም ዝርዝር ይወስዳል)
         function shareApp() {
             const botLink = "https://t.me/chinetcombot";
-            const shareMsg = "በ Chinet Com Logistics ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ! " + botLink;
-            
-            // የቴሌግራም ማጋሪያ ሊንክ
             const telegramUrl = "https://t.me/share/url?url=" + encodeURIComponent(botLink) + "&text=" + encodeURIComponent("በ Chinet Com Logistics ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ!");
-
-            // መጀመሪያ ሊንኩን ኮፒ ያደርጋል
-            navigator.clipboard.writeText(botLink).then(() => {
-                // ከዚያም ተጠቃሚውን በቀጥታ ወደ ቴሌግራም ማጋሪያ ይወስደዋል
-                window.open(telegramUrl, '_blank');
-            }).catch(err => {
-                window.open(telegramUrl, '_blank');
-            });
+            
+            navigator.clipboard.writeText(botLink);
+            window.open(telegramUrl, '_blank');
         }
 
-        async function submitData(type) {
-            alert("መረጃው በትክክል ተልኳል!");
+        // Admin Approval Logic
+        async function submitToAdmin(type) {
+            // እዚህ ጋር መረጃው ለ Admin ይላካል (Backend ካለህ ከዛ ጋር ይገናኛል)
+            // ለጊዜው ለተጠቃሚው ሂደቱን እናሳውቃለን
+            alert("መረጃው ለAdmin ተልኳል! በአጭር ጊዜ ውስጥ ተገምግሞ Approve ሲደረግ በቻናላችን ላይ ይለጠፋል።");
+            
+            // መረጃው በሂደት ላይ (Pending) መሆኑን የሚያሳይ ምልክት
+            console.log(type + " data sent for approval.");
+            
             showHome();
         }
     </script>
