@@ -7,7 +7,6 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 15px; color: white; }
         
-        /* የፎርሙ ስፋት እንዲቀንስ ተደርጓል */
         .container { width: 100%; max-width: 420px; }
         
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -26,10 +25,19 @@
         
         .hint { font-size: 12px; color: #e67e22; font-weight: bold; display: block; margin-bottom: 8px; }
         .other-input { display: none; }
-        .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 17px; cursor: pointer; margin-top: 10px; font-weight: bold; }
+        .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 17px; cursor: pointer; margin-top: 10px; font-weight: bold; position: relative; }
         .back-btn { background: #e74c3c; margin-top: 8px; }
 
-        /* የታችኛው ሊንኮች ስታይል */
+        /* Loading Spinner Style */
+        .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; position: absolute; right: 15px; top: 15px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast Notification Style */
+        #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-weight: bold; }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+
         .extra-links { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; }
         .extra-links p { font-size: 13px; color: #666; margin-bottom: 10px; font-weight: bold; }
         .link-btn { display: inline-block; padding: 8px 12px; margin: 4px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: bold; color: white; }
@@ -43,7 +51,7 @@
         <div id="mainMenu" class="menu-grid">
             <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
             <div class="menu-btn" onclick="copyInviteLink()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
-            <div class="menu-btn" onclick="alert('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ። ከዚያ አስጫኝ ከሆኑ - መኪና እፈልጋለሁ፣ ሹፌር ከሆኑ - ጭነት እፈልጋለሁ የሚለውን በመምረጥ መረጃዎን ይሙሉ!')"><span>📖</span> Instruction</div>
+            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ። ከዚያ መረጃዎን ይሙሉ!')"><span>📖</span> Instruction</div>
             <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
@@ -74,16 +82,10 @@
 
             <input type="text" id="price" placeholder="ዋጋ - በኩንታል/ቶን">
             <span class="hint">ድርድር አለው</span>
-            <input type="text" id="date" placeholder="የመጫኛ ቀን">
-            
-            <button class="submit-btn" onclick="submitData('load')">ጥያቄውን ላክ</button>
+            <input type="date" id="date"> <button class="submit-btn" id="loadSubmit" onclick="submitData('load')">
+                ጥያቄውን ላክ <div class="spinner" id="loadSpinner"></div>
+            </button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
-
-            <div class="extra-links">
-                <p>ጭነት ወይም መኪና ለማግኘት</p>
-                <a href="https://t.me/chinetcom" class="link-btn link-chan">📢 Join Channel</a>
-                <a href="https://t.me/chinetcometh" class="link-btn link-grp">👥 Join Group</a>
-            </div>
         </div>
 
         <div id="truckForm" class="card">
@@ -100,23 +102,21 @@
             
             <input type="text" id="plate" placeholder="ታርጋ ቁጥር ኮድ ጨምሮ">
             <input type="text" id="currentCity" placeholder="መኪናው አሁን ያለበት ከተማ">
-            <input type="text" id="targetCity" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ (ለምሳሌ፡ ማንኛውም ቦታ)">
+            <input type="text" id="targetCity" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ">
             
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ ቁጥር">
             <input type="text" id="helperName" placeholder="የረዳት ስም">
             <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ ቁጥር">
             
-            <button class="submit-btn" onclick="submitData('truck')">ምዝገባውን ላክ</button>
+            <button class="submit-btn" id="truckSubmit" onclick="submitData('truck')">
+                ምዝገባውን ላክ <div class="spinner" id="truckSpinner"></div>
+            </button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
-
-            <div class="extra-links">
-                <p>ጭነት ወይም መኪና ለማግኘት</p>
-                <a href="https://t.me/chinetcom" class="link-btn link-chan">📢 Join Channel</a>
-                <a href="https://t.me/chinetcometh" class="link-btn link-grp">👥 Join Group</a>
-            </div>
         </div>
     </div>
+
+    <div id="toast">መልእክት</div>
 
     <script>
         function toggleOther(selectId, inputId) {
@@ -140,19 +140,34 @@
             else document.getElementById('truckForm').style.display = 'block';
         }
 
-        // የቦት ሊንክን ኮፒ የሚያደርግ ተግባር
+        // Toast Message Function
+        function showToast(message, color = "#333") {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.style.backgroundColor = color;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
         function copyInviteLink() {
             const botLink = "https://t.me/chinetcombot";
             const textToCopy = "Chinet Com Logistics ቦትን ተጠቅመው ጭነት ወይም መኪና በቀላሉ ያግኙ፦ " + botLink;
-            
             navigator.clipboard.writeText(textToCopy).then(function() {
-                alert("የቦቱ መጋበዣ ሊንክ ኮፒ ተደርጓል!");
+                showToast("የቦቱ መጋበዣ ሊንክ ኮፒ ተደርጓል!", "#27ae60");
             }, function() {
-                alert("ሊንኩን ኮፒ ማድረግ አልተቻለም።");
+                showToast("ሊንኩን ኮፒ ማድረግ አልተቻለም።", "#e74c3c");
             });
         }
 
         async function submitData(type) {
+            const spinner = document.getElementById(type + 'Spinner');
+            const btn = document.getElementById(type + 'Submit');
+            
+            // ፎርሙን ለጊዜው ማሰናከል
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.8";
+            spinner.style.display = "block";
+
             let payload = { type: type };
             if(type === 'load') {
                 payload.org = document.getElementById('org').value;
@@ -184,9 +199,21 @@
                     body: JSON.stringify(payload)
                 });
                 const res = await resp.json();
-                alert(res.message);
-                if(res.status === 'success') showHome();
-            } catch (e) { alert("ስህተት ተከስቷል!"); }
+                
+                if(res.status === 'success') {
+                    showToast("በተሳካ ሁኔታ ተልኳል!", "#27ae60");
+                    setTimeout(() => showHome(), 1500);
+                } else {
+                    showToast("ስህተት፡ " + res.message, "#e74c3c");
+                }
+            } catch (e) { 
+                showToast("ሰርቨር ጋር መገናኘት አልተቻለም!", "#e74c3c"); 
+            } finally {
+                // ሁኔታውን ወደ ነበረበት መመለስ
+                btn.style.pointerEvents = "auto";
+                btn.style.opacity = "1";
+                spinner.style.display = "none";
+            }
         }
     </script>
 </body>
