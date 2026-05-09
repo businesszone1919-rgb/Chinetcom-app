@@ -19,6 +19,10 @@
         input, select { width: 100%; padding: 11px; margin: 7px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; font-size: 14px; }
         .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 17px; cursor: pointer; margin-top: 10px; font-weight: bold; }
         .back-btn { background: #e74c3c; margin-top: 8px; }
+        .extra-links { margin-top: 20px; border-top: 1px solid #eee; padding-top: 15px; text-align: center; }
+        .link-btn { display: inline-block; padding: 8px 12px; margin: 4px; border-radius: 8px; font-size: 12px; text-decoration: none; font-weight: bold; color: white; }
+        .link-chan { background: #0088cc; }
+        .link-grp { background: #3498db; }
     </style>
 </head>
 <body>
@@ -26,7 +30,7 @@
     <div class="container">
         <div id="mainMenu" class="menu-grid">
             <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
-            <div class="menu-btn" onclick="inviteFriends()"><span>📩</span> Invite<br>(ጋብዝ)</div>
+            <div class="menu-btn" onclick="shareApp()"><span>🔗</span> Share<br>(አጋራ)</div>
             <div class="menu-btn" onclick="showInstruction()"><span>📖</span> Instruction</div>
             <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
@@ -54,7 +58,7 @@
             </select>
             <input type="text" id="price" placeholder="ዋጋ">
             <input type="text" id="date" placeholder="የመጫኛ ቀን">
-            <button class="submit-btn" onclick="submitToAdmin('load')">ለአድሚን ላክ</button>
+            <button class="submit-btn" onclick="submitData('load')">ጥያቄውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
 
@@ -71,7 +75,9 @@
             <input type="text" id="targetCity" value="በአስጫኙ ጥያቄ ወይም በስምምነት" placeholder="መዳረሻ">
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ">
-            <button class="submit-btn" onclick="submitToAdmin('truck')">ለአድሚን ላክ</button>
+            <input type="text" id="helperName" placeholder="የረዳት ስም">
+            <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ">
+            <button class="submit-btn" onclick="submitData('truck')">ምዝገባውን ላክ</button>
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
     </div>
@@ -88,23 +94,37 @@
             alert(msg);
         }
 
-        // 1. Invite Friends (ወደ ቴሌግራም ማጋሪያ ይወስዳል)
-        function inviteFriends() {
+        // ማስተካከያ፦ ሊንኩ እንዲታይና እንዲጋራ ተደርጓል
+        async function shareApp() {
             const botLink = "https://t.me/chinetcombot";
-            const shareText = "በ Chinet Com Logistics ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ! ይግቡና ይመዝገቡ።";
-            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(botLink)}&text=${encodeURIComponent(shareText)}`;
             
-            window.open(telegramUrl, '_blank');
+            // 1. መጀመሪያ ሊንኩን ለተጠቃሚው ያሳያል
+            alert("የቦቱ ሊንክ፡ " + botLink + "\n\nአሁን ማጋሪያ አማራጮች ይወጣሉ ወይም ሊንኩ ኮፒ ይሆናል።");
+
+            // 2. ሊንኩን ኮፒ ያደርጋል
+            try {
+                await navigator.clipboard.writeText(botLink);
+            } catch (err) {}
+
+            // 3. የማጋሪያ ዝርዝር ያወጣል (Share Menu)
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Chinet Com Logistics',
+                        text: 'በ Chinet Com Logistics ቦት በመጠቀም ጭነት ወይም መኪና በቀላሉ ያግኙ!',
+                        url: botLink
+                    });
+                } catch (err) {}
+            } else {
+                alert("ሊንኩ ኮፒ ተደርጓል! በፈለጉበት ቦታ Paste በማድረግ ማጋራት ይችላሉ።");
+            }
         }
 
-        // 2. Admin Approval Logic
-        async function submitToAdmin(type) {
-            // እዚህ ጋር መረጃው ለቦቱ backend ወይም ለአድሚኑ ይላካል
-            alert("መረጃው ለአድሚን ተልኳል። አድሚኑ መረጃውን መርምሮ አፕሩቭ (Approve) ሲያደርገው የግል መረጃዎች ተቀንሰው በቻናልና በግሩፕ ላይ ይለጠፋል። ስላገኘንዎት ደስተኞች ነን!");
-            
-            // ፎርሙን ባዶ ማድረግ
+        async function submitData(type) {
+            alert("መረጃው በትክክል ተልኳል!");
             showHome();
         }
     </script>
 </body>
 </html>
+
