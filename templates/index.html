@@ -3,212 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chinet Com Logistics</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Chinet Com</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 10px; color: white; }
-        .container { width: 100%; max-width: 400px; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 18px 10px; border-radius: 15px; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
-        .card, .choice-card { background: white; padding: 18px; border-radius: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); color: #333; }
-        .card h2 { color: #1a73e8; text-align: center; margin: 0 0 12px 0; font-size: 18px; }
-        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; outline: none; }
-        .other-input { display: none; }
-        .submit-btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 8px; font-weight: bold; position: relative; }
-        .back-btn { background: #e74c3c; margin-top: 6px; }
-        .choice-btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; color: white; transition: 0.2s; line-height: 1.4; }
-        .btn-load { background: #f39c12; }
-        .btn-truck { background: #2980b9; }
-        .footer-links { margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 15px; text-align: center; backdrop-filter: blur(5px); }
-        .footer-links p { font-size: 13px; margin: 0 0 10px 0; color: #fff; font-weight: bold; }
-        .link-flex { display: flex; gap: 8px; justify-content: center; }
-        .link-btn { flex: 1; padding: 10px 5px; border-radius: 8px; font-size: 11px; text-decoration: none; font-weight: bold; color: white; }
-        .link-chan { background: #0088cc; }
-        .link-grp { background: #3498db; }
-        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; position: absolute; right: 15px; top: 12px; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        #toast { visibility: hidden; min-width: 220px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 14px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; }
-        #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.6s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        body { font-family: sans-serif; background-color: #f0f2f5; padding: 15px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
+        h2 { color: #1a73e8; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="container">
-        <div id="mainMenu" class="menu-grid">
-            <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
-            <div class="menu-btn" onclick="copyInviteLink()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
-            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ።')"><span>📖</span> Help</div>
-            <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
-        </div>
-
-        <div id="choicePage" class="choice-card">
-            <h2>ምን መመዝገብ ይፈልጋሉ?</h2>
-            <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ<br><small>(የሚጫን ጭነት አለኝ)</small></button>
-            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ<br><small>(መኪና/ትራንስፖርት አለኝ)</small></button>
-            <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
-        </div>
-
-        <!-- አስጫኝ ፎርም -->
-        <div id="loadForm" class="card">
-            <h2>📦 የጭነት ዝርዝር</h2>
-            <input type="text" id="org" placeholder="የድርጅት ወይም የባለቤት ስም">
-            <input type="tel" id="phone" placeholder="የስልክ ቁጥር (10 ዲጂት)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="from" placeholder="መነሻ ቦታ">
-                <input type="text" id="to" placeholder="መድረሻ ቦታ">
-            </div>
-            <div style="display:flex; gap:5px;">
-                <input type="text" id="cargo" placeholder="የጭነት አይነት">
-                <input type="text" id="amount" placeholder="መጠን (ቶን)">
-            </div>
-            <select id="truckType" onchange="toggleOther('truckType', 'otherTruck')">
-                <option value="">የሚፈለገው መኪና አይነት</option>
-                <option value="አይሱዙ">አይሱዙ</option>
-                <option value="FSR">FSR</option>
-                <option value="ሲኖትራክ">ሲኖትራክ</option>
-                <option value="ሌላ">ሌላ</option>
-            </select>
-            <input type="text" id="otherTruck" class="other-input" placeholder="የመኪናውን አይነት ይጥቀሱ">
-            <input type="text" id="price" placeholder="ዋጋ - በኩንታል/ቶን">
-            <input type="date" id="date">
-            <button class="submit-btn" id="loadSubmit" onclick="submitData('load')">ጥያቄውን ላክ <div class="spinner" id="loadSpinner"></div></button>
-            <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
-        </div>
-
-        <!-- ሹፌር ፎርም -->
-        <div id="truckForm" class="card">
-            <h2>🚛 የመኪና ዝርዝር</h2>
-            <select id="vType" onchange="toggleOther('vType', 'otherVType')">
-                <option value="">የመኪናው አይነት</option>
-                <option value="FSR">FSR</option>
-                <option value="ሲኖትራክ">ሲኖትራክ</option>
-                <option value="አይሱዙ">አይሱዙ</option>
-                <option value="ሌላ">ሌላ</option>
-            </select>
-            <input type="text" id="otherVType" class="other-input" placeholder="የመኪና አይነት">
-            <input type="text" id="plate" placeholder="ታርጋ (ኮድ ጨምሮ)">
-            <input type="text" id="currentCity" placeholder="መኪናው ያለበት ከተማ">
-            <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
-            <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ (ካለ)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
-            <button class="submit-btn" id="truckSubmit" onclick="submitData('truck')">ምዝገባውን ላክ <div class="spinner" id="truckSpinner"></div></button>
-            <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
-        </div>
-
-        <div class="footer-links">
-            <p>ጭነት ወይም መኪና ለማግኘት ይቀላቀሉ</p>
-            <div class="link-flex">
-                <a href="https://t.me/chinetcom" target="_blank" class="link-btn link-chan">📢 Join Channel</a>
-                <a href="https://t.me/chinetcometh" target="_blank" class="link-btn link-grp">👥 Join Group</a>
-            </div>
-        </div>
+    <div class="card">
+        <h2>🚚 የጭነት ጥያቄ ማቅረቢያ</h2>
+        <input type="text" id="org" placeholder="የባለቤት ወይም የድርጅት ስም">
+        <input type="tel" id="phone" placeholder="የስልክ ቁጥር"> <input type="text" id="from" placeholder="መነሻ ቦታ (ለምሳሌ፡ ባህር ዳር)">
+        <input type="text" id="to" placeholder="መድረሻ ቦታ (ለምሳሌ፡ አዲስ አበባ)">
+        <input type="text" id="cargo" placeholder="የጭነቱ አይነት (ለምሳሌ፡ ሲሚንቶ)">
+        <input type="text" id="amount" placeholder="መጠን (ለምሳሌ፡ 400 ኩንታል)">
+        <select id="truckType">
+            <option value="">የሚፈለገው መኪና አይነት</option>
+            <option value="አይሱዙ">አይሱዙ</option>
+            <option value="FSR">FSR</option>
+            <option value="ሲኖትራክ">ሲኖትራክ</option>
+            <option value="ሌላ">ሌላ</option>
+        </select>
+        <input type="text" id="price" placeholder="የሚከፈል ዋጋ/ታሪፍ">
+        <input type="text" id="date" placeholder="የመጫኛ ቀን">
+        
+        <button onclick="submitLoad()">ጥያቄውን ላክ</button>
     </div>
 
-    <div id="toast">መልእክት</div>
-
     <script>
-        function toggleOther(selectId, inputId) {
-            const select = document.getElementById(selectId);
-            const input = document.getElementById(inputId);
-            input.style.display = (select.value === 'ሌላ') ? 'block' : 'none';
-        }
-        function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'grid'; }
-        function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
-        function hideAll() { 
-            document.getElementById('mainMenu').style.display = 'none'; 
-            document.getElementById('choicePage').style.display = 'none';
-            document.getElementById('loadForm').style.display = 'none';
-            document.getElementById('truckForm').style.display = 'none';
-        }
-        function openForm(type) {
-            hideAll();
-            document.getElementById(type + 'Form').style.display = 'block';
-        }
-        function showToast(message, color = "#333") {
-            const toast = document.getElementById("toast");
-            toast.innerText = message; toast.style.backgroundColor = color;
-            toast.className = "show";
-            setTimeout(() => { toast.className = ""; }, 3000);
-        }
-        function copyInviteLink() {
-            navigator.clipboard.writeText("Chinet Com ቦትን ተጠቅመው ጭነት ያግኙ፦ https://t.me/chinetcombot");
-            showToast("ሊንኩ ተገልብጧል!", "#27ae60");
-        }
-
-        // --- ማስተካከያ፡ ሙሉ መረጃውን ለአድሚን የመላክ ሎጂክ ---
-        async function submitData(type) {
-            const btn = document.getElementById(type + 'Submit');
-            const spinner = document.getElementById(type + 'Spinner');
-            
-            // ስልክ ቼክ
-            const phoneVal = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
-            if (phoneVal.length !== 10) {
-                showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ያስገቡ!", "#e74c3c");
-                return;
-            }
-
-            // ሙሉ መረጃውን መሰብሰብ (ምንም ሳይቀነስ)
-            let payload = { 
-                action: "admin_review", // ለሰርቨሩ "አድሚን ይየው" የሚል ምልክት
-                form_type: type 
+        async function submitLoad() {
+            const data = {
+                type: 'load',
+                org: document.getElementById('org').value,
+                phone: document.getElementById('phone').value,
+                from: document.getElementById('from').value,
+                to: document.getElementById('to').value,
+                cargo: document.getElementById('cargo').value,
+                amount: document.getElementById('amount').value,
+                truckType: document.getElementById('truckType').value,
+                price: document.getElementById('price').value,
+                date: document.getElementById('date').value
             };
-            
-            if(type === 'load') {
-                payload.full_data = {
-                    "ባለቤት": document.getElementById('org').value,
-                    "ስልክ": document.getElementById('phone').value, // ሙሉ ስልክ
-                    "መነሻ": document.getElementById('from').value,
-                    "መድረሻ": document.getElementById('to').value,
-                    "ጭነት": document.getElementById('cargo').value,
-                    "መጠን": document.getElementById('amount').value,
-                    "መኪና": document.getElementById('truckType').value === 'ሌላ' ? document.getElementById('otherTruck').value : document.getElementById('truckType').value,
-                    "ዋጋ": document.getElementById('price').value,
-                    "ቀን": document.getElementById('date').value
-                };
-            } else {
-                payload.full_data = {
-                    "መኪና": document.getElementById('vType').value === 'ሌላ' ? document.getElementById('otherVType').value : document.getElementById('vType').value,
-                    "ታርጋ": document.getElementById('plate').value, // ሙሉ ታርጋ
-                    "ከተማ": document.getElementById('currentCity').value,
-                    "አሽከርካሪ": document.getElementById('driverName').value,
-                    "ስልክ": document.getElementById('driverPhone').value, // ሙሉ ስልክ
-                    "ረዳት_ስልክ": document.getElementById('helperPhone').value
-                };
-            }
 
-            // ባዶ ቦታ መኖሩን ቼክ ማድረግ
-            for (let key in payload.full_data) {
-                if (payload.full_data[key] === "" && key !== "ረዳት_ስልክ") {
-                    showToast("እባክዎ ሁሉንም መረጃዎች ይሙሉ!", "#e74c3c");
-                    return;
-                }
-            }
-
-            btn.style.pointerEvents = "none";
-            btn.style.opacity = "0.7";
-            spinner.style.display = "block";
-
-            // ወደ ሰርቨር መላክ
             try {
-                // ማሳሰቢያ፡ እዚህ ጋር ያለው '/submit' የአንተ ቦት የሚቀበልበት URL ነው
-                const response = await fetch('/submit', {
+                const resp = await fetch('/submit', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(data)
                 });
-                
-                showToast("መረጃው ለአድሚን ተልኳል! ሲጸድቅ ይለጠፋል።", "#27ae60");
-                setTimeout(showHome, 2500);
+                const res = await resp.json();
+                alert(res.message);
+                if(res.status === 'success') location.reload();
             } catch (e) {
-                // ሰርቨር ባይኖርም ለሙከራ ስኬት ያሳያል
-                showToast("መረጃው ለአድሚን በሙሉ ተልኳል!", "#27ae60");
-                setTimeout(showHome, 2500);
-            } finally {
-                btn.style.pointerEvents = "auto";
-                btn.style.opacity = "1";
-                spinner.style.display = "none";
+                alert("ስህተት ተከስቷል!");
             }
         }
     </script>
