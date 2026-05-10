@@ -6,27 +6,28 @@
     <title>Chinet Com Logistics</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #1c4587; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 10px; color: white; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1e3c72, #2a5298); min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 10px; color: white; }
         .container { width: 100%; max-width: 400px; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); padding: 20px 10px; border-radius: 15px; color: white; font-size: 15px; cursor: pointer; text-align: center; }
-        .choice-card { background: white; padding: 25px; border-radius: 25px; display: none; text-align: center; color: #333; }
-        .choice-card h2 { font-size: 24px; margin-bottom: 20px; color: #333; }
-        .choice-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white; line-height: 1.4; }
-        .btn-orange { background-color: #f39c12; }
-        .btn-blue { background-color: #2980b9; }
-        .btn-red { background-color: #e74c3c; width: 100%; padding: 12px; border-radius: 10px; margin-top: 10px; color: white; border: none; font-size: 16px; }
-        .card { background: white; padding: 20px; border-radius: 20px; display: none; color: #333; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 10px; font-size: 14px; box-sizing: border-box; }
-        .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; position: relative; }
-        .footer-section { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 15px; text-align: center; margin-top: 20px; }
-        .footer-section p { font-size: 14px; margin-bottom: 10px; }
-        .link-flex { display: flex; gap: 10px; }
-        .link-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 12px; text-decoration: none; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 18px 10px; border-radius: 15px; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; }
+        .card, .choice-card { background: white; padding: 18px; border-radius: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); color: #333; }
+        .card h2 { color: #1a73e8; text-align: center; margin: 0 0 12px 0; font-size: 18px; }
+        input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; outline: none; }
+        .submit-btn { width: 100%; padding: 12px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 15px; cursor: pointer; margin-top: 8px; font-weight: bold; position: relative; }
+        .back-btn { background: #e74c3c; margin-top: 6px; }
+        .choice-btn { width: 100%; padding: 15px; margin: 8px 0; border-radius: 12px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; color: white; line-height: 1.4; }
+        .btn-load { background: #f39c12; }
+        .btn-truck { background: #2980b9; }
+        .footer-links { margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 15px; text-align: center; backdrop-filter: blur(5px); }
+        .footer-links p { font-size: 13px; margin: 0; color: #fff; }
+        .link-flex { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+        .link-btn { flex: 1; padding: 10px 5px; border-radius: 8px; font-size: 11px; text-decoration: none; font-weight: bold; color: white; }
         .link-chan { background: #0088cc; }
         .link-grp { background: #3498db; }
-        #toast { visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
-        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        .spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 0.8s linear infinite; position: absolute; right: 15px; top: 12px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #toast { visibility: hidden; min-width: 220px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 14px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; }
+        #toast.show { visibility: visible; animation: fadein 0.4s, fadeout 0.4s 2.6s; }
         @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
         @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
@@ -34,53 +35,55 @@
 <body>
 
     <div class="container">
-        <div id="mainMenu">
-            <div class="menu-grid">
-                <div class="menu-btn" onclick="showChoice()">📝 Register<br>(መመዝገብ)</div>
-                <div class="menu-btn" onclick="copyInviteLink()">🔗 Invite<br>(ጋብዝ)</div>
-                <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ።')">📖 Help</div>
-                <div class="menu-btn" onclick="location.reload()">🔄 Start<br>(እንደገና)</div>
-            </div>
-            <div class="footer-section">
-                <p>ጭነት ወይም መኪና ለማግኘት ይቀላቀሉ</p>
-                <div class="link-flex">
-                    <a href="https://t.me/chinetcom" class="link-btn link-chan">📢 Join Channel</a>
-                    <a href="https://t.me/chinetcometh" class="link-btn link-grp">👥 Join Group</a>
-                </div>
-            </div>
+        <div id="mainMenu" class="menu-grid">
+            <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
+            <div class="menu-btn" onclick="copyInviteLink()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
+            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ።')"><span>📖</span> Help</div>
+            <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
         <div id="choicePage" class="choice-card">
             <h2>ምን መመዝገብ ይፈልጋሉ?</h2>
-            <button class="choice-btn btn-orange" onclick="openForm('load')">📦 መኪና እፈልጋለሁ<br>(የሚጫን ጭነት አለኝ)</button>
-            <button class="choice-btn btn-blue" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ<br>(መኪና/ትራንስፖርት አለኝ)</button>
-            <button class="btn-red" onclick="showHome()">ተመለስ</button>
+            <button class="choice-btn btn-load" onclick="openForm('load')">📦 መኪና እፈልጋለሁ<br><small>(የሚጫን ጭነት አለኝ)</small></button>
+            <button class="choice-btn btn-truck" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ<br><small>(መኪና/ትራንስፖርት አለኝ)</small></button>
+            <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
         </div>
 
         <div id="loadForm" class="card">
-            <h2 style="text-align:center">📦 የጭነት ዝርዝር</h2>
+            <h2>📦 የጭነት ዝርዝር</h2>
             <input type="text" id="org" placeholder="የባለቤት ስም">
-            <input type="tel" id="phone" placeholder="ስልክ ቁጥር (10 ዲጂት)" maxlength="10">
-            <input type="text" id="from" placeholder="📍 የጭነት መነሻ">
-            <input type="text" id="to" placeholder="🏁 የጭነት መድረሻ">
-            <input type="text" id="cargo" placeholder="📦 አይነት">
-            <input type="text" id="amount" placeholder="⚖️ መጠን">
+            <input type="tel" id="phone" placeholder="የስልክ ቁጥር (10 ዲጂት)" maxlength="10">
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="from" placeholder="📍 መነሻ">
+                <input type="text" id="to" placeholder="🏁 መድረሻ">
+            </div>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="cargo" placeholder="📦 አይነት">
+                <input type="text" id="amount" placeholder="⚖️ መጠን">
+            </div>
             <input type="text" id="price" placeholder="💰 ዋጋ">
             <input type="date" id="date">
-            <button class="submit-btn" id="loadSubmitBtn" onclick="submitData('load')">ለአድሚን ላክ</button>
-            <button class="btn-red" onclick="showChoice()">ተመለስ</button>
+            <button class="submit-btn" id="loadSubmit" onclick="submitData('load')">ለአድሚን ላክ <div class="spinner" id="loadSpinner"></div></button>
+            <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
 
         <div id="truckForm" class="card">
-            <h2 style="text-align:center">🚛 የመኪና ዝርዝር</h2>
+            <h2>🚛 የመኪና ዝርዝር</h2>
             <input type="text" id="vType" placeholder="🚛 የመኪና አይነት">
             <input type="text" id="plate" placeholder="🔢 ታርጋ">
-            <input type="text" id="currentCity" placeholder="📍 መኪናው ያለበት ቦታ">
-            <input type="text" id="toCity" placeholder="🏁 መድረሻ">
+            <input type="text" id="currentCity" placeholder="📍 ያለበት ከተማ">
+            <input type="text" id="toCity" placeholder="🏁 መድረሻ ከተማ">
             <input type="text" id="driverName" placeholder="👤 የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="📞 ስልክ ቁጥር" maxlength="10">
-            <button class="submit-btn" id="truckSubmitBtn" onclick="submitData('truck')">ለአድሚን ላክ</button>
-            <button class="btn-red" onclick="showChoice()">ተመለስ</button>
+            <button class="submit-btn" id="truckSubmit" onclick="submitData('truck')">ለአድሚን ላክ <div class="spinner" id="truckSpinner"></div></button>
+            <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
+        </div>
+
+        <div class="footer-links">
+            <div class="link-flex">
+                <a href="https://t.me/chinetcom" target="_blank" class="link-btn link-chan">📢 Join Channel</a>
+                <a href="https://t.me/chinetcometh" target="_blank" class="link-btn link-grp">👥 Join Group</a>
+            </div>
         </div>
     </div>
 
@@ -90,7 +93,11 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
 
-        function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'block'; }
+        // ትናንት የተጠቀምንባቸው መረጃዎች
+        const BOT_TOKEN = "7544061556:AAFFN9-XhN1I_m3T_L3e0f9D9A5wN6r0f6I";
+        const ADMIN_ID = "1438917823";
+
+        function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'grid'; }
         function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
         function openForm(type) { hideAll(); document.getElementById(type + 'Form').style.display = 'block'; }
         function hideAll() { 
@@ -100,75 +107,56 @@
             document.getElementById('truckForm').style.display = 'none';
         }
 
-        function showToast(message) {
-            const toast = document.getElementById("toast");
-            toast.innerText = message;
-            toast.className = "show";
-            setTimeout(() => { toast.className = ""; }, 3000);
+        function showToast(msg) {
+            const t = document.getElementById("toast"); t.innerText = msg;
+            t.className = "show"; setTimeout(() => t.className = "", 3000);
         }
 
         function copyInviteLink() {
             navigator.clipboard.writeText("https://t.me/chinetcombot");
-            showToast("የመጋበዣ ሊንኩ ተገልብጧል!");
+            showToast("ሊንኩ ተገልብጧል!");
         }
 
         async function submitData(type) {
-            const phoneVal = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
-            if(phoneVal.length !== 10) {
-                showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ያስገቡ!");
-                return;
-            }
+            const phone = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
+            if(phone.length !== 10) { showToast("እባክዎ 10 ዲጂት ስልክ ያስገቡ!"); return; }
 
-            const btn = document.getElementById(type + 'SubmitBtn');
-            btn.disabled = true;
-            btn.innerText = "በመላክ ላይ...";
+            const btn = document.getElementById(type + 'Submit');
+            const spinner = document.getElementById(type + 'Spinner');
+            
+            btn.style.pointerEvents = "none"; btn.style.opacity = "0.7";
+            spinner.style.display = "block";
 
-            // 1. ለአድሚኑ የሚታየው ሙሉ መረጃ (Admin Preview)
-            let admin_data = "";
-            // 2. ቻናል ላይ የሚለጠፈው የተቀነሰ መረጃ (Channel Post)
-            let channel_post = "";
-
+            let adminMsg = "";
             if(type === 'load') {
-                const org = document.getElementById('org').value;
-                const from = document.getElementById('from').value;
-                const to = document.getElementById('to').value;
-                const cargo = document.getElementById('cargo').value;
-                const amount = document.getElementById('amount').value;
-                const price = document.getElementById('price').value;
-                const date = document.getElementById('date').value;
-
-                admin_data = `🚚 አዲስ የጭነት ጥያቄ\n📍 መነሻ: ${from}\n🏁 መድረሻ: ${to}\n📦 አይነት: ${cargo}\n⚖️ መጠን: ${amount}\n💰 ዋጋ: ${price}\n📅 ቀን: ${date}\n👤 ባለቤት: ${org}\n📞 ስልክ: ${phoneVal}`;
-                
-                channel_post = `🚚 አዲስ የጭነት ጥያቄ\n📍 መነሻ: ${from}\n🏁 መድረሻ: ${to}\n📦 አይነት: ${cargo}\n⚖️ መጠን: ${amount}\n💰 ዋጋ: ${price}\n📅 ቀን: ${date}\n\nℹ️ ለመጫን በቦታችን @chinetcombot በኩል ይጠይቁ።`;
+                adminMsg = `📦 #አዲስ_ጭነት_ጥያቄ\n\n👤 ባለቤት: ${document.getElementById('org').value}\n📞 ስልክ: ${phone}\n📍 መነሻ: ${document.getElementById('from').value}\n🏁 መድረሻ: ${document.getElementById('to').value}\n📦 አይነት: ${document.getElementById('cargo').value}\n⚖️ መጠን: ${document.getElementById('amount').value}\n💰 ዋጋ: ${document.getElementById('price').value}\n📅 ቀን: ${document.getElementById('date').value}`;
             } else {
-                const vType = document.getElementById('vType').value;
-                const plate = document.getElementById('plate').value;
-                const city = document.getElementById('currentCity').value;
-                const toCity = document.getElementById('toCity').value;
-                const driver = document.getElementById('driverName').value;
-
-                admin_data = `🚛 አዲስ የመኪና ምዝገባ\n🚛 አይነት: ${vType}\n🔢 ታርጋ: ${plate}\n📍 ያለበት: ${city}\n🏁 መድረሻ: ${toCity}\n👤 ሹፌር: ${driver}\n📞 ስልክ: ${phoneVal}`;
-                
-                channel_post = `🚛 አዲስ የመኪና ምዝገባ\n🚛 አይነት: ${vType}\n📍 ያለበት: ${city}\n🏁 መድረሻ: ${toCity}\n\nℹ️ ጭነት ለማግኘት በቦታችን @chinetcombot በኩል ይጠይቁ።`;
+                adminMsg = `🚛 #አዲስ_መኪና_ምዝገባ\n\n🚛 አይነት: ${document.getElementById('vType').value}\n🔢 ታርጋ: ${document.getElementById('plate').value}\n📍 ያለበት: ${document.getElementById('currentCity').value}\n🏁 መድረሻ: ${document.getElementById('toCity').value}\n👤 ሹፌር: ${document.getElementById('driverName').value}\n📞 ስልክ: ${phone}`;
             }
-
-            // ቦቱ በቀላሉ እንዲለይ payload እናዘጋጃለን
-            let payload = {
-                action: "admin_review",
-                admin_text: admin_data,      // ለአድሚን የሚላክ
-                public_text: channel_post,    // አድሚኑ ሲያጸድቅ የሚለጠፍ
-                user_id: tg.initDataUnsafe?.user?.id
-            };
 
             try {
-                // ዳታውን ለቦቱ እንልካለን
-                tg.sendData(JSON.stringify(payload)); 
-                showToast("መረጃው ለአድሚን ተልኳል!");
-                setTimeout(() => tg.close(), 2000);
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: ADMIN_ID,
+                        text: adminMsg,
+                        reply_markup: {
+                            inline_keyboard: [[{ text: "✅ Approve & Post", callback_data: "approve_post" }]]
+                        }
+                    })
+                });
+
+                if(response.ok) {
+                    showToast("ለአድሚን ተልኳል!");
+                    setTimeout(() => tg.close(), 2000);
+                } else {
+                    throw new Error();
+                }
             } catch (e) {
-                showToast("ስህተት ተፈጥሯል!");
-                btn.disabled = false;
-                btn.innerText = "ለአድሚን ላክ";
+                showToast("ስህተት ተፈጥሯል! እባክዎ እንደገና ይሞክሩ።");
+                btn.style.pointerEvents = "auto"; btn.style.opacity = "1";
+                spinner.style.display = "none";
             }
         }
     </script>
