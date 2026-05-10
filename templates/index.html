@@ -112,10 +112,9 @@
             showToast("የመጋበዣ ሊንኩ ተገልብጧል!");
         }
 
-        // --- ዋናው ማስተካከያ፡ ዳታውን ወደ ቦቱ ሰርቨር መላክ ---
         async function submitData(type) {
-            const phone = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
-            if(phone.length !== 10) {
+            const phoneVal = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
+            if(phoneVal.length !== 10) {
                 showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ያስገቡ!");
                 return;
             }
@@ -124,47 +123,52 @@
             btn.disabled = true;
             btn.innerText = "በመላክ ላይ...";
 
-            let payload = {
-                user_id: tg.initDataUnsafe?.user?.id || "Unknown",
-                user_name: tg.initDataUnsafe?.user?.first_name || "Guest",
-                action: "admin_review",
-                form_type: type,
-                full_data: {}
-            };
+            // 1. ለአድሚኑ የሚታየው ሙሉ መረጃ (Admin Preview)
+            let admin_data = "";
+            // 2. ቻናል ላይ የሚለጠፈው የተቀነሰ መረጃ (Channel Post)
+            let channel_post = "";
 
             if(type === 'load') {
-                payload.full_data = {
-                    "📍 የጭነት መነሻ": document.getElementById('from').value,
-                    "🏁 የጭነት መድረሻ": document.getElementById('to').value,
-                    "📦 አይነት": document.getElementById('cargo').value,
-                    "⚖️ መጠን": document.getElementById('amount').value,
-                    "💰 ዋጋ": document.getElementById('price').value,
-                    "📅 ቀን": document.getElementById('date').value,
-                    "👤 ባለቤት": document.getElementById('org').value,
-                    "📞 ስልክ": document.getElementById('phone').value
-                };
+                const org = document.getElementById('org').value;
+                const from = document.getElementById('from').value;
+                const to = document.getElementById('to').value;
+                const cargo = document.getElementById('cargo').value;
+                const amount = document.getElementById('amount').value;
+                const price = document.getElementById('price').value;
+                const date = document.getElementById('date').value;
+
+                admin_data = `🚚 አዲስ የጭነት ጥያቄ\n📍 መነሻ: ${from}\n🏁 መድረሻ: ${to}\n📦 አይነት: ${cargo}\n⚖️ መጠን: ${amount}\n💰 ዋጋ: ${price}\n📅 ቀን: ${date}\n👤 ባለቤት: ${org}\n📞 ስልክ: ${phoneVal}`;
+                
+                channel_post = `🚚 አዲስ የጭነት ጥያቄ\n📍 መነሻ: ${from}\n🏁 መድረሻ: ${to}\n📦 አይነት: ${cargo}\n⚖️ መጠን: ${amount}\n💰 ዋጋ: ${price}\n📅 ቀን: ${date}\n\nℹ️ ለመጫን በቦታችን @chinetcombot በኩል ይጠይቁ።`;
             } else {
-                payload.full_data = {
-                    "🚛 መኪና": document.getElementById('vType').value,
-                    "🔢 ታርጋ": document.getElementById('plate').value,
-                    "📍 ያለበት": document.getElementById('currentCity').value,
-                    "🏁 መድረሻ": document.getElementById('toCity').value,
-                    "👤 ሹፌር": document.getElementById('driverName').value,
-                    "📞 ስልክ": document.getElementById('driverPhone').value
-                };
+                const vType = document.getElementById('vType').value;
+                const plate = document.getElementById('plate').value;
+                const city = document.getElementById('currentCity').value;
+                const toCity = document.getElementById('toCity').value;
+                const driver = document.getElementById('driverName').value;
+
+                admin_data = `🚛 አዲስ የመኪና ምዝገባ\n🚛 አይነት: ${vType}\n🔢 ታርጋ: ${plate}\n📍 ያለበት: ${city}\n🏁 መድረሻ: ${toCity}\n👤 ሹፌር: ${driver}\n📞 ስልክ: ${phoneVal}`;
+                
+                channel_post = `🚛 አዲስ የመኪና ምዝገባ\n🚛 አይነት: ${vType}\n📍 ያለበት: ${city}\n🏁 መድረሻ: ${toCity}\n\nℹ️ ጭነት ለማግኘት በቦታችን @chinetcombot በኩል ይጠይቁ።`;
             }
 
+            // ቦቱ በቀላሉ እንዲለይ payload እናዘጋጃለን
+            let payload = {
+                action: "admin_review",
+                admin_text: admin_data,      // ለአድሚን የሚላክ
+                public_text: channel_post,    // አድሚኑ ሲያጸድቅ የሚለጠፍ
+                user_id: tg.initDataUnsafe?.user?.id
+            };
+
             try {
-                // አስፈላጊ፡ ይህ ዳታ ለአድሚን እንዲደርስ ቦትህ ጋር Webhook ወይም API endpoint ሊኖርህ ይገባል
-                // ለጊዜው በ sendData በኩል ወደ ቦቱ ይላካል (ቦቱ በ Bot.on('web_app_data') መቀበል አለበት)
+                // ዳታውን ለቦቱ እንልካለን
                 tg.sendData(JSON.stringify(payload)); 
-                
-                showToast("መረጃው ለአድሚን ተልኳል! ሲጸድቅ ይለጠፋል።");
+                showToast("መረጃው ለአድሚን ተልኳል!");
                 setTimeout(() => tg.close(), 2000);
             } catch (e) {
-                showToast("ስህተት ተፈጥሯል፣ እባክዎ እንደገና ይሞክሩ።");
+                showToast("ስህተት ተፈጥሯል!");
                 btn.disabled = false;
-                btn.innerText = "ላክ";
+                btn.innerText = "ለአድሚን ላክ";
             }
         }
     </script>
