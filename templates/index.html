@@ -3,62 +3,175 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chinet Com</title>
+    <title>Chinet Com Logistics</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body { font-family: sans-serif; background-color: #f0f2f5; padding: 15px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 450px; margin: auto; }
-        h2 { color: #1a73e8; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 14px; background: #28a745; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1c4587; min-height: 100vh; display: flex; align-items: center; justify-content: center; margin: 0; padding: 10px; color: white; }
+        .container { width: 100%; max-width: 400px; }
+        
+        /* Main Menu Grid - Image 1 style */
+        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .menu-btn { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255,255,255,0.2); padding: 20px 10px; border-radius: 15px; color: white; font-size: 15px; cursor: pointer; text-align: center; }
+
+        /* Choice Card - Image 2 style */
+        .choice-card { background: white; padding: 25px; border-radius: 25px; display: none; text-align: center; color: #333; }
+        .choice-card h2 { font-size: 24px; margin-bottom: 20px; color: #333; }
+        
+        .choice-btn { width: 100%; padding: 15px; margin: 10px 0; border-radius: 15px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; color: white; line-height: 1.4; }
+        .btn-orange { background-color: #f39c12; } /* መኪና እፈልጋለሁ */
+        .btn-blue { background-color: #2980b9; }   /* ጭነት እፈልጋለሁ */
+        .btn-red { background-color: #e74c3c; width: 100%; padding: 12px; border-radius: 10px; margin-top: 10px; color: white; border: none; font-size: 16px; }
+
+        /* Forms style */
+        .card { background: white; padding: 20px; border-radius: 20px; display: none; color: #333; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ccc; border-radius: 10px; font-size: 14px; box-sizing: border-box; }
+        .submit-btn { width: 100%; padding: 14px; background: #27ae60; color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* Footer - Image 1 & 2 style */
+        .footer-section { background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 15px; text-align: center; margin-top: 20px; }
+        .footer-section p { font-size: 14px; margin-bottom: 10px; }
+        .link-flex { display: flex; gap: 10px; }
+        .link-btn { flex: 1; padding: 10px; border-radius: 8px; font-size: 12px; text-decoration: none; color: white; font-weight: bold; display: flex; align-items: center; justify-content: center; }
+        .link-chan { background: #0088cc; }
+        .link-grp { background: #3498db; }
+
+        #toast { visibility: hidden; min-width: 200px; background-color: #333; color: #fff; text-align: center; border-radius: 10px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>🚚 የጭነት ጥያቄ ማቅረቢያ</h2>
-        <input type="text" id="org" placeholder="የባለቤት ወይም የድርጅት ስም">
-        <input type="tel" id="phone" placeholder="የስልክ ቁጥር"> <input type="text" id="from" placeholder="መነሻ ቦታ (ለምሳሌ፡ ባህር ዳር)">
-        <input type="text" id="to" placeholder="መድረሻ ቦታ (ለምሳሌ፡ አዲስ አበባ)">
-        <input type="text" id="cargo" placeholder="የጭነቱ አይነት (ለምሳሌ፡ ሲሚንቶ)">
-        <input type="text" id="amount" placeholder="መጠን (ለምሳሌ፡ 400 ኩንታል)">
-        <select id="truckType">
-            <option value="">የሚፈለገው መኪና አይነት</option>
-            <option value="አይሱዙ">አይሱዙ</option>
-            <option value="FSR">FSR</option>
-            <option value="ሲኖትራክ">ሲኖትራክ</option>
-            <option value="ሌላ">ሌላ</option>
-        </select>
-        <input type="text" id="price" placeholder="የሚከፈል ዋጋ/ታሪፍ">
-        <input type="text" id="date" placeholder="የመጫኛ ቀን">
-        
-        <button onclick="submitLoad()">ጥያቄውን ላክ</button>
+
+    <div class="container">
+        <div id="mainMenu">
+            <div class="menu-grid">
+                <div class="menu-btn" onclick="showChoice()">📝 Register<br>(መመዝገብ)</div>
+                <div class="menu-btn" onclick="copyInviteLink()">🔗 Invite<br>(ጋብዝ)</div>
+                <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ።')">📖 Help</div>
+                <div class="menu-btn" onclick="location.reload()">🔄 Start<br>(እንደገና)</div>
+            </div>
+            <div class="footer-section">
+                <p>ጭነት ወይም መኪና ለማግኘት ይቀላቀሉ</p>
+                <div class="link-flex">
+                    <a href="https://t.me/chinetcom" class="link-btn link-chan">📢 Join Channel</a>
+                    <a href="https://t.me/chinetcometh" class="link-btn link-grp">👥 Join Group</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="choicePage" class="choice-card">
+            <h2>ምን መመዝገብ ይፈልጋሉ?</h2>
+            <button class="choice-btn btn-orange" onclick="openForm('load')">📦 መኪና እፈልጋለሁ<br>(የሚጫን ጭነት አለኝ)</button>
+            <button class="choice-btn btn-blue" onclick="openForm('truck')">🚛 ጭነት እፈልጋለሁ<br>(መኪና/ትራንስፖርት አለኝ)</button>
+            <button class="btn-red" onclick="showHome()">ተመለስ</button>
+            <div class="footer-section" style="background: #e1e8f0; color: #333; margin-top: 25px;">
+                <p>ጭነት ወይም መኪና ለማግኘት ይቀላቀሉ</p>
+                <div class="link-flex">
+                    <a href="#" class="link-btn link-chan">📢 Join Channel</a>
+                    <a href="#" class="link-btn link-grp">👥 Join Group</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="loadForm" class="card">
+            <h2 style="text-align:center">📦 የጭነት ዝርዝር</h2>
+            <input type="text" id="org" placeholder="የባለቤት ስም">
+            <input type="tel" id="phone" placeholder="ስልክ ቁጥር (10 ዲጂት)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <input type="text" id="from" placeholder="📍 የጭነት መነሻ (ለምሳሌ፡ DB)">
+            <input type="text" id="to" placeholder="🏁 የጭነት መድረሻ (ለምሳሌ፡ AA)">
+            <input type="text" id="cargo" placeholder="📦 አይነት (ለምሳሌ፡ Seminto)">
+            <input type="text" id="amount" placeholder="⚖️ መጠን (ለምሳሌ፡ 400)">
+            <input type="text" id="price" placeholder="💰 ዋጋ (ለምሳሌ፡ 500)">
+            <input type="date" id="date">
+            <button class="submit-btn" onclick="submitData('load')">ላክ</button>
+            <button class="btn-red" onclick="showChoice()">ተመለስ</button>
+        </div>
+
+        <div id="truckForm" class="card">
+            <h2 style="text-align:center">🚛 የመኪና ዝርዝር</h2>
+            <input type="text" id="vType" placeholder="🚛 የመኪና አይነት">
+            <input type="text" id="plate" placeholder="🔢 ታርጋ">
+            <input type="text" id="currentCity" placeholder="📍 መኪናው ያለበት ቦታ">
+            <input type="text" id="toCity" placeholder="🏁 መድረሻ">
+            <input type="text" id="driverName" placeholder="👤 የአሽከርካሪ ስም">
+            <input type="tel" id="driverPhone" placeholder="📞 ስልክ ቁጥር" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+            <button class="submit-btn" onclick="submitData('truck')">ላክ</button>
+            <button class="btn-red" onclick="showChoice()">ተመለስ</button>
+        </div>
     </div>
 
+    <div id="toast">መልእክት</div>
+
     <script>
-        async function submitLoad() {
-            const data = {
-                type: 'load',
-                org: document.getElementById('org').value,
-                phone: document.getElementById('phone').value,
-                from: document.getElementById('from').value,
-                to: document.getElementById('to').value,
-                cargo: document.getElementById('cargo').value,
-                amount: document.getElementById('amount').value,
-                truckType: document.getElementById('truckType').value,
-                price: document.getElementById('price').value,
-                date: document.getElementById('date').value
+        function showHome() { hideAll(); document.getElementById('mainMenu').style.display = 'block'; }
+        function showChoice() { hideAll(); document.getElementById('choicePage').style.display = 'block'; }
+        function openForm(type) { hideAll(); document.getElementById(type + 'Form').style.display = 'block'; }
+        function hideAll() { 
+            document.getElementById('mainMenu').style.display = 'none'; 
+            document.getElementById('choicePage').style.display = 'none';
+            document.getElementById('loadForm').style.display = 'none';
+            document.getElementById('truckForm').style.display = 'none';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(() => { toast.className = ""; }, 3000);
+        }
+
+        function copyInviteLink() {
+            navigator.clipboard.writeText("https://t.me/chinetcombot");
+            showToast("የመጋበዣ ሊንኩ ተገልብጧል!");
+        }
+
+        async function submitData(type) {
+            // ስልክ ቼክ (10 ዲጂት)
+            const phone = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
+            if(phone.length !== 10) {
+                showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ያስገቡ!");
+                return;
+            }
+
+            // --- ምስል 3 ላይ ባለው ፎርማት ዳታውን ማደራጀት ---
+            let payload = {
+                action: "admin_review",
+                form_type: type,
+                full_data: {}
             };
 
-            try {
-                const resp = await fetch('/submit', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify(data)
-                });
-                const res = await resp.json();
-                alert(res.message);
-                if(res.status === 'success') location.reload();
-            } catch (e) {
-                alert("ስህተት ተከስቷል!");
+            if(type === 'load') {
+                payload.full_data = {
+                    "header": "🚚 አዲስ የጭነት ጥያቄ",
+                    "📍 የጭነት መነሻ": document.getElementById('from').value,
+                    "🏁 የጭነት መድረሻ": document.getElementById('to').value,
+                    "📦 አይነት": document.getElementById('cargo').value,
+                    "⚖️ መጠን": document.getElementById('amount').value,
+                    "🚛 መኪና": "ተፈላጊ", 
+                    "💰 ዋጋ": document.getElementById('price').value,
+                    "📅 ቀን": document.getElementById('date').value,
+                    "ባለቤት_ስልክ": document.getElementById('phone').value // ለአድሚን ብቻ የሚቀር
+                };
+            } else {
+                payload.full_data = {
+                    "header": "🚛 አዲስ የመኪና ምዝገባ",
+                    "🚛 መኪና": document.getElementById('vType').value,
+                    "🔢 ታርጋ": document.getElementById('plate').value,
+                    "📍 ያለበት": document.getElementById('currentCity').value,
+                    "🏁 መድረሻ": document.getElementById('toCity').value,
+                    "👤 ሹፌር": document.getElementById('driverName').value,
+                    "📞 ስልክ": document.getElementById('driverPhone').value
+                };
+            }
+
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.sendData(JSON.stringify(payload));
+                showToast("ለአድሚን ተልኳል!");
+                setTimeout(() => window.Telegram.WebApp.close(), 2000);
+            } else {
+                console.log("Data:", payload);
+                showToast("ተልኳል (ሙከራ)");
             }
         }
     </script>
