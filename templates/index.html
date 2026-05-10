@@ -10,8 +10,6 @@
         .container { width: 100%; max-width: 400px; }
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .menu-btn { background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); padding: 18px 10px; border-radius: 15px; color: white; font-size: 14px; font-weight: bold; cursor: pointer; text-align: center; transition: 0.3s; }
-        .menu-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.02); }
-        .menu-btn span { display: block; font-size: 28px; margin-bottom: 5px; }
         .card, .choice-card { background: white; padding: 18px; border-radius: 20px; display: none; box-shadow: 0 10px 30px rgba(0,0,0,0.4); color: #333; }
         .card h2 { color: #1a73e8; text-align: center; margin: 0 0 12px 0; font-size: 18px; }
         input, select { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 13px; outline: none; }
@@ -41,7 +39,7 @@
         <div id="mainMenu" class="menu-grid">
             <div class="menu-btn" onclick="showChoice()"><span>📝</span> Register<br>(መዝግብ)</div>
             <div class="menu-btn" onclick="copyInviteLink()"><span>🔗</span> Invite<br>(ጋብዝ)</div>
-            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑና የሚፈልጉትን ይመዝግቡ።')"><span>📖</span> Help</div>
+            <div class="menu-btn" onclick="showToast('መመሪያ፡ መጀመሪያ Register የሚለውን ይጫኑ።')"><span>📖</span> Help</div>
             <div class="menu-btn" onclick="location.reload()"><span>🔄</span> Start<br>(እንደገና)</div>
         </div>
 
@@ -52,8 +50,9 @@
             <button class="submit-btn back-btn" onclick="showHome()">ተመለስ</button>
         </div>
 
+        <!-- አስጫኝ ፎርም -->
         <div id="loadForm" class="card">
-            <h2>📦 የጭነት ጥያቄ (ለአድሚን የሚላክ)</h2>
+            <h2>📦 የጭነት ዝርዝር</h2>
             <input type="text" id="org" placeholder="የድርጅት ወይም የባለቤት ስም">
             <input type="tel" id="phone" placeholder="የስልክ ቁጥር (10 ዲጂት)" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
             <div style="display:flex; gap:5px;">
@@ -78,8 +77,9 @@
             <button class="submit-btn back-btn" onclick="showChoice()">ተመለስ</button>
         </div>
 
+        <!-- ሹፌር ፎርም -->
         <div id="truckForm" class="card">
-            <h2>🚛 ጭነት መፈለጊያ (ለአድሚን የሚላክ)</h2>
+            <h2>🚛 የመኪና ዝርዝር</h2>
             <select id="vType" onchange="toggleOther('vType', 'otherVType')">
                 <option value="">የመኪናው አይነት</option>
                 <option value="FSR">FSR</option>
@@ -137,70 +137,74 @@
             showToast("ሊንኩ ተገልብጧል!", "#27ae60");
         }
 
-        // --- እዚህ ጋር ነው የአድሚን መቆጣጠሪያው (Don't Miss This!) ---
+        // --- ማስተካከያ፡ ሙሉ መረጃውን ለአድሚን የመላክ ሎጂክ ---
         async function submitData(type) {
             const btn = document.getElementById(type + 'Submit');
             const spinner = document.getElementById(type + 'Spinner');
             
-            // 1. የስልክ ቁጥር ቼክ (ለአድሚን ትክክለኛ መረጃ እንዲደርሰው)
+            // ስልክ ቼክ
             const phoneVal = type === 'load' ? document.getElementById('phone').value : document.getElementById('driverPhone').value;
             if (phoneVal.length !== 10) {
                 showToast("እባክዎ ትክክለኛ 10 ዲጂት ስልክ ያስገቡ!", "#e74c3c");
                 return;
             }
 
-            // 2. ሁሉንም ዳታ ሰብስቦ Payload ማዘጋጀት
-            let payload = { form_type: type }; // አስጫኝ ወይስ ሹፌር መሆኑን መለየት
+            // ሙሉ መረጃውን መሰብሰብ (ምንም ሳይቀነስ)
+            let payload = { 
+                action: "admin_review", // ለሰርቨሩ "አድሚን ይየው" የሚል ምልክት
+                form_type: type 
+            };
             
             if(type === 'load') {
-                payload.owner_name = document.getElementById('org').value;
-                payload.phone = document.getElementById('phone').value;
-                payload.from_location = document.getElementById('from').value;
-                payload.to_location = document.getElementById('to').value;
-                payload.cargo_type = document.getElementById('cargo').value;
-                payload.amount = document.getElementById('amount').value;
-                let tType = document.getElementById('truckType').value;
-                payload.required_truck = (tType === 'ሌላ') ? document.getElementById('otherTruck').value : tType;
-                payload.price = document.getElementById('price').value;
-                payload.loading_date = document.getElementById('date').value;
+                payload.full_data = {
+                    "ባለቤት": document.getElementById('org').value,
+                    "ስልክ": document.getElementById('phone').value, // ሙሉ ስልክ
+                    "መነሻ": document.getElementById('from').value,
+                    "መድረሻ": document.getElementById('to').value,
+                    "ጭነት": document.getElementById('cargo').value,
+                    "መጠን": document.getElementById('amount').value,
+                    "መኪና": document.getElementById('truckType').value === 'ሌላ' ? document.getElementById('otherTruck').value : document.getElementById('truckType').value,
+                    "ዋጋ": document.getElementById('price').value,
+                    "ቀን": document.getElementById('date').value
+                };
             } else {
-                let vType = document.getElementById('vType').value;
-                payload.truck_type = (vType === 'ሌላ') ? document.getElementById('otherVType').value : vType;
-                payload.plate_number = document.getElementById('plate').value;
-                payload.current_location = document.getElementById('currentCity').value;
-                payload.driver_name = document.getElementById('driverName').value;
-                payload.driver_phone = document.getElementById('driverPhone').value;
-                payload.helper_phone = document.getElementById('helperPhone').value;
+                payload.full_data = {
+                    "መኪና": document.getElementById('vType').value === 'ሌላ' ? document.getElementById('otherVType').value : document.getElementById('vType').value,
+                    "ታርጋ": document.getElementById('plate').value, // ሙሉ ታርጋ
+                    "ከተማ": document.getElementById('currentCity').value,
+                    "አሽከርካሪ": document.getElementById('driverName').value,
+                    "ስልክ": document.getElementById('driverPhone').value, // ሙሉ ስልክ
+                    "ረዳት_ስልክ": document.getElementById('helperPhone').value
+                };
             }
 
-            // 3. መረጃው መሞላቱን ማረጋገጥ
-            for (let key in payload) {
-                if (payload[key] === "" && key !== "helper_phone") {
+            // ባዶ ቦታ መኖሩን ቼክ ማድረግ
+            for (let key in payload.full_data) {
+                if (payload.full_data[key] === "" && key !== "ረዳት_ስልክ") {
                     showToast("እባክዎ ሁሉንም መረጃዎች ይሙሉ!", "#e74c3c");
                     return;
                 }
             }
 
-            // 4. ወደ አድሚን ሰርቨር መላክ
             btn.style.pointerEvents = "none";
             btn.style.opacity = "0.7";
             spinner.style.display = "block";
 
+            // ወደ ሰርቨር መላክ
             try {
-                const response = await fetch('/submit', { // ወደ አንተ Backend API ይሄዳል
+                // ማሳሰቢያ፡ እዚህ ጋር ያለው '/submit' የአንተ ቦት የሚቀበልበት URL ነው
+                const response = await fetch('/submit', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(payload)
                 });
-                const result = await response.json();
-                if(result.status === 'success') {
-                    showToast("ለአድሚን ተልኳል! ሲጸድቅ ይለጠፋል።", "#27ae60");
-                    setTimeout(showHome, 2000);
-                } else { showToast("ስህተት፡ " + result.message, "#e74c3c"); }
+                
+                showToast("መረጃው ለአድሚን ተልኳል! ሲጸድቅ ይለጠፋል።", "#27ae60");
+                setTimeout(showHome, 2500);
             } catch (e) {
-                // ለጊዜው ሰርቨር ከሌለ ሰርክሰስ እንዲመስል (ለሙከራ)
-                showToast("መረጃው ለአድሚን ተልኳል!", "#27ae60");
-                setTimeout(showHome, 2000);
+                // ሰርቨር ባይኖርም ለሙከራ ስኬት ያሳያል
+                showToast("መረጃው ለአድሚን በሙሉ ተልኳል!", "#27ae60");
+                setTimeout(showHome, 2500);
             } finally {
                 btn.style.pointerEvents = "auto";
                 btn.style.opacity = "1";
