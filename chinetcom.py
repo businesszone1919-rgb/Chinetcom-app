@@ -18,7 +18,6 @@ GROUP_LINK = "https://t.me/chinetcometh"
 
 COUNTER_FILE = "id_counter.txt"
 
-# --- በራስ-ሰር የሚጨምር መለያ ቁጥር መቆጣጠሪያ ፈንክሽን ---
 def get_next_post_id():
     """የመጨረሻውን ቁጥር ከፋይል አንብቦ በአንድ ይጨምራል፣ ፋይሉ ከሌለ አዲስ ይፈጥራል"""
     if not os.path.exists(COUNTER_FILE):
@@ -36,7 +35,6 @@ def get_next_post_id():
     with open(COUNTER_FILE, "w") as f:
         f.write(str(next_id))
         
-    # ቁጥሩን ወደ CC00001 ፎርማት ይቀይረዋል (በዜሮዎች ይሞላል)
     return f"CC{current_id:05d}"
 
 def send_to_telegram(chat_id, message, reply_markup=None):
@@ -77,7 +75,6 @@ def submit():
                 "⚠️ <b>አዲስ ጥያቄ መጥቷል! [ጭነት]</b>\n\n"
                 "📦 <b>[የሚጫን ጭነት አለኝ]</b>\n"
                 "━━━━━━━━━━━━━━━━━━━━\n"
-                "🟢 <b>አዲስ የጭነት ጥያቄ መጥቷል!</b>\n\n"
                 f" ○   <b>የጭነት ባለቤት:-</b> {org}\n"
                 f" ○   <b>ስልክ:-</b> <code>{phone}</code>\n"
                 f" ○   <b>መነሻ (From):-</b> {dep}\n"
@@ -85,11 +82,10 @@ def submit():
                 f" ○   <b>የጭነት አይነት:-</b> <code>{cargo}</code>\n"
                 f" ○   <b>መጠን:-</b> {amount} ኩንታል/ቶን\n"
                 f" ○   <b>የሚፈለግ መኪና:-</b> {truck}\n"
-                f" ○   <b>የተመደበ ዋጋ:-</b> {price} ETB\n"
+                f" ○   <b>የተመደብ ዋጋ:-</b> {price} ETB\n"
                 f" ○   <b>ቀን:-</b> {date}\n"
                 "━━━━━━━━━━━━━━━━━━━━"
             )
-        
         else:
             v_type = data.get('vType', '---')
             plate = data.get('plate', '---')
@@ -103,7 +99,6 @@ def submit():
                 "⚠️ <b>አዲስ ጥያቄ መጥቷል! [መኪና]</b>\n\n"
                 "🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ (መኪና አለኝ)]</b>\n"
                 "━━━━━━━━━━━━━━━━━━━━\n"
-                "🔴 <b>ነፃ መኪና አለ! (የጭነት ጥያቄ)</b>\n\n"
                 f" ○   <b>የመኪና አይነት:-</b> {v_type}\n"
                 f" ○   <b>ታርጋ:-</b> <code>{plate}</code>\n"
                 f" ○   <b>የአሁኑ መገኛ:-</b> {curr_city}\n"
@@ -120,10 +115,8 @@ def submit():
                 {"text": "❌ Reject", "callback_data": "reject_post"}
             ]]
         }
-        
         send_to_telegram(ADMIN_ID, admin_msg, markup)
         return jsonify({"status": "success", "message": "መረጃው ተልኳል፤ አድሚን ሲያጸድቀው ይለጠፋል።"})
-        
     except Exception as e:
         return jsonify({"status": "error", "message": str(e)}), 400
 
@@ -142,27 +135,42 @@ def bot_polling():
                         cb_data = cb["data"]
                         
                         if "approve_" in cb_data:
-                            # ፖስቱ ሲጸድቅ ልዩ ID (መለያ ቁጥር) በራስ-ሰር ይፈጠራል
+                            # ፖስቱ ሲጸድቅ ልዩ ID (መለያ ቁጥር) እዚህ ጋር ይፈጠራል
                             post_id = get_next_post_id()
                             lines = raw_text.split('\n')
                             
+                            cargo = "---"
+                            dep = "---"
+                            to = "---"
+                            amount = "---"
+                            price = "---"
+                            v_type = "---"
+                            curr = "---"
+                            target = "---"
+
+                            # ከአድሚን መልዕክት ላይ መረጃዎችን በጥንቃቄ መለየት
+                            for l in lines:
+                                if "የጭነት አይነት" in l or "አይነት" in l: 
+                                    cargo = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "መነሻ" in l or "መነሻ (From)" in l: 
+                                    dep = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "መድረሻ" in l or "መድረሻ (To)" in l: 
+                                    to = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "መጠን" in l: 
+                                    amount = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "የተመደብ ዋጋ" in l or "ዋጋ" in l: 
+                                    price = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "የመኪና አይነት" in l: 
+                                    v_type = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "የአሁኑ መገኛ" in l or "ያለበት" in l: 
+                                    curr = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                if "መድረሻ ከተማ" in l:
+                                    target = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+
+                            # በምስል 1000054092.jpg እና 1000054094.jpg መሰረት ቻናል ላይ የሚለጠፈውን ጽሑፍ መገንባት
                             if "load" in cb_data:
-                                cargo = "---"
-                                dep = "---"
-                                to = "---"
-                                amount = "---"
-                                price = "---"
-                                
-                                for l in lines:
-                                    if "የጭነት አይነት" in l: cargo = l.split(':-')[-1].strip()
-                                    if "መነሻ" in l: dep = l.split(':-')[-1].strip()
-                                    if "መድረሻ" in l: to = l.split(':-')[-1].strip()
-                                    if "መጠን" in l: amount = l.split(':-')[-1].strip()
-                                    if "የተመደበ ዋጋ" in l: price = l.split(':-')[-1].strip()
-                                
-                                # መለያ ቁጥሩ (ID) ከላይ በርዕሱ ላይ በደማቁ ገብቷል
                                 final_post = (
-                                    f"📦 <b>[የሚጫን ጭነት አለኝ] - መለያ ቁጥር: <code>{post_id}</code></b>\n"
+                                    f"📦 <b>[የሚጫን ጭነት አለኝ] - ID: <code>{post_id}</code></b>\n"
                                     "━━━━━━━━━━━━━━━━━━━━\n"
                                     "🟢 <b>አዲስ የጭነት ጥያቄ መጥቷል!</b>\n\n"
                                     f" ○   <b>የጭነት አይነት:-</b> <code>{cargo}</code>\n"
@@ -173,30 +181,23 @@ def bot_polling():
                                     "━━━━━━━━━━━━━━━━━━━━"
                                 )
                             else:
-                                v_type = "---"
-                                curr = "---"
-                                
-                                for l in lines:
-                                    if "የመኪና አይነት" in l: v_type = l.split(':-')[-1].strip()
-                                    if "የአሁኑ መገኛ" in l: curr = l.split(':-')[-1].strip()
-                                
-                                # መለያ ቁጥሩ (ID) ከላይ በርዕሱ ላይ በደማቁ ገብቷል
                                 final_post = (
-                                    f"🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ] - መለያ ቁጥር: <code>{post_id}</code></b>\n"
+                                    f"🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ] - ID: <code>{post_id}</code></b>\n"
                                     "━━━━━━━━━━━━━━━━━━━━\n"
                                     "🔴 <b>ነፃ መኪና አለ! (የጭነት ጥያቄ)</b>\n\n"
                                     f" ○   <b>የመኪና አይነት:-</b> {v_type}\n"
                                     f" ○   <b>የአሁኑ መገኛ:-</b> {curr}\n"
+                                    f" ○   <b>መድረሻ ከተማ:-</b> {target}\n"
                                     " ○   <b>የመጫኛ ዝግጁነት:-</b> ወዲያውኑ\n"
                                     "━━━━━━━━━━━━━━━━━━━━"
                                 )
                             
+                            # በምስል 1000054109.jpg መሰረት የበታች የሊንክ ጽሑፎችን ማያያዝ
                             final_post += f"\n\n✨ <b>ያሉበት ቦታ ሆነው ጭነት ወይም መኪና ለማግኘት ሊንኩን ይጫኑ</b> 👇\n🔗 {BOT_LINK}"
                             final_post += f"\n\n📩 <b>መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ</b> 👇"
                             
-                            # ተጠቃሚው ኤጀንቱን ሲያናግር የትኛውን ID እንደፈለገ አስቀድሞ ጽሑፍ ዝግጁ እንዲሆን (Telegram text link)
-                            # ይህ ሲሆን ተጠቃሚው 'ኤጀንቱን አግኝ' ሲል የኤጀንቱ ቻት ይከፈትና መጻፊያው ላይ በራስ-ሰር የፖስቱ ID ይጻፋል
-                            agent_url = f"https://t.me/{AGENT_USERNAME}?text=ሰላም%20የመለያ%20ቁጥር%20{post_id}%20መረጃ%20እፈልጋለሁ"
+                            # ወደ ኤጀንቱ መለያ ቁጥሩን ይዞ የሚሄድ ሊንክ (Deep Linking)
+                            agent_url = f"https://t.me/{AGENT_USERNAME}?text=ሰላም%20የመለያ%20ቁጥር%20{post_id}%20ጭነት%20መረጃ%20እፈልጋለሁ"
                             
                             post_markup = {
                                 "inline_keyboard": [
@@ -206,9 +207,11 @@ def bot_polling():
                                 ]
                             }
                             
+                            # ወደ ቻናል እና ግሩፕ መላክ
                             send_to_telegram(CHANNEL_ID, final_post, post_markup)
                             send_to_telegram(GROUP_ID, final_post, post_markup)
                             
+                            # አድሚኑ ጋር የነበረውን መልዕክት ማስተካከል
                             requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
                                           json={
                                               "chat_id": ADMIN_ID, 
