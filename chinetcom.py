@@ -12,17 +12,39 @@ CHANNEL_ID = "-1003606657314"
 GROUP_ID = "-1003961942282"
 AGENT_USERNAME = "chinetcomet"
 
-# ትክክለኛ ሊንኮች
 BOT_LINK = "https://t.me/chinetcombot"
 CHANNEL_LINK = "https://t.me/chinetcom"
 GROUP_LINK = "https://t.me/chinetcometh"
+
+COUNTER_FILE = "id_counter.txt"
+
+# --- በራስ-ሰር የሚጨምር መለያ ቁጥር መቆጣጠሪያ ፈንክሽን ---
+def get_next_post_id():
+    """የመጨረሻውን ቁጥር ከፋይል አንብቦ በአንድ ይጨምራል፣ ፋይሉ ከሌለ አዲስ ይፈጥራል"""
+    if not os.path.exists(COUNTER_FILE):
+        with open(COUNTER_FILE, "w") as f:
+            f.write("1")
+        current_id = 1
+    else:
+        with open(COUNTER_FILE, "r") as f:
+            try:
+                current_id = int(f.read().strip())
+            except ValueError:
+                current_id = 1
+    
+    next_id = current_id + 1
+    with open(COUNTER_FILE, "w") as f:
+        f.write(str(next_id))
+        
+    # ቁጥሩን ወደ CC00001 ፎርማት ይቀይረዋል (በዜሮዎች ይሞላል)
+    return f"CC{current_id:05d}"
 
 def send_to_telegram(chat_id, message, reply_markup=None):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     payload = {
         "chat_id": chat_id,
         "text": message,
-        "parse_mode": "HTML",  # የ HTML ታጎች እንዲሰሩ
+        "parse_mode": "HTML",
         "reply_markup": reply_markup
     }
     try:
@@ -40,7 +62,6 @@ def submit():
         data = request.get_json(force=True)
         form_type = data.get('type')
         
-        # 1. መረጃው 'የሚጫን ጭነት አለኝ' ከሆነ (Load Form)
         if form_type == 'load':
             org = data.get('org', '---')
             phone = data.get('phone', '---')
@@ -52,7 +73,6 @@ def submit():
             price = data.get('price', '---')
             date = data.get('date', '---')
 
-            # ለአድሚን የሚላከው (ሁሉንም ሚስጥራዊ መረጃ የያዘ)
             admin_msg = (
                 "⚠️ <b>አዲስ ጥያቄ መጥቷል! [ጭነት]</b>\n\n"
                 "📦 <b>[የሚጫን ጭነት አለኝ]</b>\n"
@@ -70,7 +90,6 @@ def submit():
                 "━━━━━━━━━━━━━━━━━━━━"
             )
         
-        # 2. መረጃው 'አስቸኳይ ጭነት እፈልጋለሁ' ከሆነ (Truck Form)
         else:
             v_type = data.get('vType', '---')
             plate = data.get('plate', '---')
@@ -80,7 +99,6 @@ def submit():
             d_phone = data.get('driverPhone', '---')
             h_phone = data.get('helperPhone', '---')
 
-            # ለአድሚን የሚላከው (ሁሉንም ሚስጥራዊ መረጃ የያዘ)
             admin_msg = (
                 "⚠️ <b>አዲስ ጥያቄ መጥቷል! [መኪና]</b>\n\n"
                 "🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ (መኪና አለኝ)]</b>\n"
@@ -103,17 +121,7 @@ def submit():
             ]]
         }
         
-        # ውሂቡን (Data) በቴሌግራም መልዕክት ውስጥ በድብቅ ለማስተላለፍ 'Text' ላይ አንጨምረውም
-        # ይልቁንም አድሚኑ ጋር በተለየ ማርክአፕ ወይም መልዕክት መልክ እናስቀምጠዋለን።
-        # ነገር ግን መረጃውን በቀላሉ መልሶ ለማግኘት እንዲመች አድሚን ቻት ላይ እንልካለን።
-        
-        # ለአድሚኑ መረጃውን ለመለየት እንዲመቸው ዋናውን ዳታ በጽሑፉ ግርጌ በድብቅ (Hidden HTML tag) እናስቀምጠዋለን
-        if form_type == 'load':
-            hidden_data = f"<a href='hidden://data?type=load&dep={dep}&to={to}&cargo={cargo}&amount={amount}&truck={truck}&price={price}'> </a>"
-        else:
-            hidden_data = f"<a href='hidden://data?type=truck&v_type={v_type}&curr={curr_city}&target={target_city}'> </a>"
-            
-        send_to_telegram(ADMIN_ID, admin_msg + hidden_data, markup)
+        send_to_telegram(ADMIN_ID, admin_msg, markup)
         return jsonify({"status": "success", "message": "መረጃው ተልኳል፤ አድሚን ሲያጸድቀው ይለጠፋል።"})
         
     except Exception as e:
@@ -134,15 +142,11 @@ def bot_polling():
                         cb_data = cb["data"]
                         
                         if "approve_" in cb_data:
-                            # ከጽሑፉ ውስጥ የ entity ሊንኩን በመፈለግ ዳታውን በንፅህና እንመዝግባለን
-                            entities = cb["message"].get("entities", [])
-                            final_post = ""
+                            # ፖስቱ ሲጸድቅ ልዩ ID (መለያ ቁጥር) በራስ-ሰር ይፈጠራል
+                            post_id = get_next_post_id()
+                            lines = raw_text.split('\n')
                             
-                            # የትኛው ፎርም እንደሆነ ከ callback_data እንለያለን
                             if "load" in cb_data:
-                                # በምስል 1000054092.jpg መሰረት ንፁህ የቻናል ፖስት መገንባት (ሚስጥራዊ መረጃ የሌለው)
-                                # ጽሑፉን ከቀጥታ መስመሮቹ ላይ እንፈልገዋለን
-                                lines = raw_text.split('\n')
                                 cargo = "---"
                                 dep = "---"
                                 to = "---"
@@ -156,8 +160,9 @@ def bot_polling():
                                     if "መጠን" in l: amount = l.split(':-')[-1].strip()
                                     if "የተመደበ ዋጋ" in l: price = l.split(':-')[-1].strip()
                                 
+                                # መለያ ቁጥሩ (ID) ከላይ በርዕሱ ላይ በደማቁ ገብቷል
                                 final_post = (
-                                    "📦 <b>[የሚጫን ጭነት አለኝ]</b>\n"
+                                    f"📦 <b>[የሚጫን ጭነት አለኝ] - መለያ ቁጥር: <code>{post_id}</code></b>\n"
                                     "━━━━━━━━━━━━━━━━━━━━\n"
                                     "🟢 <b>አዲስ የጭነት ጥያቄ መጥቷል!</b>\n\n"
                                     f" ○   <b>የጭነት አይነት:-</b> <code>{cargo}</code>\n"
@@ -168,8 +173,6 @@ def bot_polling():
                                     "━━━━━━━━━━━━━━━━━━━━"
                                 )
                             else:
-                                # በምስል 1000054094.jpg መሰረት ንፁህ የቻናል ፖስት መገንባት (ሚስጥራዊ መረጃ የሌለው)
-                                lines = raw_text.split('\n')
                                 v_type = "---"
                                 curr = "---"
                                 
@@ -177,8 +180,9 @@ def bot_polling():
                                     if "የመኪና አይነት" in l: v_type = l.split(':-')[-1].strip()
                                     if "የአሁኑ መገኛ" in l: curr = l.split(':-')[-1].strip()
                                 
+                                # መለያ ቁጥሩ (ID) ከላይ በርዕሱ ላይ በደማቁ ገብቷል
                                 final_post = (
-                                    "🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ (መኪና አለኝ)]</b>\n"
+                                    f"🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ] - መለያ ቁጥር: <code>{post_id}</code></b>\n"
                                     "━━━━━━━━━━━━━━━━━━━━\n"
                                     "🔴 <b>ነፃ መኪና አለ! (የጭነት ጥያቄ)</b>\n\n"
                                     f" ○   <b>የመኪና አይነት:-</b> {v_type}\n"
@@ -187,29 +191,29 @@ def bot_polling():
                                     "━━━━━━━━━━━━━━━━━━━━"
                                 )
                             
-                            # በምስል 1000054096.jpg ላይ የታዩትን የግርጌ ጽሑፎች በሙሉ ማካተት
                             final_post += f"\n\n✨ <b>ያሉበት ቦታ ሆነው ጭነት ወይም መኪና ለማግኘት ሊንኩን ይጫኑ</b> 👇\n🔗 {BOT_LINK}"
                             final_post += f"\n\n📩 <b>መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ</b> 👇"
                             
-                            # የሊንክ አዝራሮች (Inline Buttons)
+                            # ተጠቃሚው ኤጀንቱን ሲያናግር የትኛውን ID እንደፈለገ አስቀድሞ ጽሑፍ ዝግጁ እንዲሆን (Telegram text link)
+                            # ይህ ሲሆን ተጠቃሚው 'ኤጀንቱን አግኝ' ሲል የኤጀንቱ ቻት ይከፈትና መጻፊያው ላይ በራስ-ሰር የፖስቱ ID ይጻፋል
+                            agent_url = f"https://t.me/{AGENT_USERNAME}?text=ሰላም%20የመለያ%20ቁጥር%20{post_id}%20መረጃ%20እፈልጋለሁ"
+                            
                             post_markup = {
                                 "inline_keyboard": [
-                                    [{"text": "👤 ኤጀንቱን አግኝ (Contact)", "url": f"https://t.me/{AGENT_USERNAME}"}],
+                                    [{"text": f"👤 ኤጀንቱን አግኝ (ID: {post_id})", "url": agent_url}],
                                     [{"text": "📢 Join Channel", "url": CHANNEL_LINK},
                                      {"text": "👥 Join Group", "url": GROUP_LINK}]
                                 ]
                             }
                             
-                            # ለቻናል እና ግሩፕ መለጠፍ
                             send_to_telegram(CHANNEL_ID, final_post, post_markup)
                             send_to_telegram(GROUP_ID, final_post, post_markup)
                             
-                            # የአድሚኑን መልዕክት ሁኔታ መቀየር
                             requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
                                           json={
                                               "chat_id": ADMIN_ID, 
                                               "message_id": cb["message"]["message_id"], 
-                                              "text": f"✅ <b>ተለጥፏል</b>\n\n{raw_text}",
+                                              "text": f"✅ <b>ተለጥፏል (ID: {post_id})</b>\n\n{raw_text}",
                                               "parse_mode": "HTML"
                                           })
                         
