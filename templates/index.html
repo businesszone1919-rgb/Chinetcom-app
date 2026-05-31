@@ -110,7 +110,12 @@
             </select>
             <input type="text" id="otherVType" class="other-input" placeholder="የመኪና አይነት">
             <input type="text" id="plate" placeholder="ታርጋ (ኮድ ጨምሮ)">
-            <input type="text" id="currentCity" placeholder="መኪናው ያለበት ከተማ">
+            
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="currentCity" placeholder="መኪናው ያለበት ከተማ">
+                <input type="text" id="targetCity" placeholder="መድረሻ ከተማ">
+            </div>
+            
             <input type="text" id="driverName" placeholder="የአሽከርካሪ ስም">
             <input type="tel" id="driverPhone" placeholder="የአሽከርካሪ ስልክ">
             <input type="tel" id="helperPhone" placeholder="የረዳት ስልክ (ካለ)">
@@ -167,12 +172,12 @@
             showToast("የመጋበዣ ሊንኩ ተገልብጧል!", "#27ae60");
         }
 
-        // --- Admin/Submission Logic ---
+        // --- የተስተካከለው የዳታ መላኪያ ጃቫስክሪፕት ---
         async function submitData(type) {
             const btn = document.getElementById(type + 'Submit');
             const spinner = document.getElementById(type + 'Spinner');
             
-            // Validation: Check if required fields are empty
+            // Validation
             const inputs = document.querySelectorAll(`#${type}Form input:not(.other-input)`);
             for(let i=0; i < inputs.length; i++) {
                 if(inputs[i].value === "" && inputs[i].id !== "helperPhone") {
@@ -181,7 +186,6 @@
                 }
             }
 
-            // Start Loading
             btn.style.pointerEvents = "none";
             btn.style.opacity = "0.7";
             spinner.style.display = "block";
@@ -203,6 +207,7 @@
                 payload.vType = (vType === 'ሌላ') ? document.getElementById('otherVType').value : vType;
                 payload.plate = document.getElementById('plate').value;
                 payload.currentCity = document.getElementById('currentCity').value;
+                payload.targetCity = document.getElementById('targetCity').value; // መድረሻ ከተማ መላኪያ
                 payload.driverName = document.getElementById('driverName').value;
                 payload.driverPhone = document.getElementById('driverPhone').value;
                 payload.helperPhone = document.getElementById('helperPhone').value;
@@ -224,9 +229,7 @@
                     showToast("ስህተት፡ " + (res.message || "መላክ አልተቻለም"), "#e74c3c");
                 }
             } catch (e) { 
-                // ለሙከራ ያህል ሰርቨር ከሌለ ስኬት እንዲያሳይ (በእውነተኛ ሰርቨር ጊዜ ይሄን Error ያሳያል)
-                showToast("መረጃው ተልኳል! (Backend Connection Demo)", "#27ae60"); 
-                setTimeout(showHome, 1500);
+                showToast("ስህተት ተፈጥሯል፣ እባክዎ ድጋሚ ይሞክሩ", "#e74c3c"); 
             } finally {
                 btn.style.pointerEvents = "auto";
                 btn.style.opacity = "1";
@@ -236,4 +239,3 @@
     </script>
 </body>
 </html>
-
