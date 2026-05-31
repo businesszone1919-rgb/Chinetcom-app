@@ -95,6 +95,7 @@ def submit():
             d_phone = data.get('driverPhone', '---')
             h_phone = data.get('helperPhone', '---')
 
+            # ለአድሚን መጀመሪያ 'መድረሻ (To)' ተብሎ ወጥ በሆነ ፎርማት ይላካል
             admin_msg = (
                 "⚠️ <b>አዲስ ጥያቄ መጥቷል! [መኪና]</b>\n\n"
                 "🚨 <b>[አስቸኳይ ጭነት እፈልጋለሁ (መኪና አለኝ)]</b>\n"
@@ -102,7 +103,7 @@ def submit():
                 f" ○   <b>የመኪና አይነት:-</b> {v_type}\n"
                 f" ○   <b>ታርጋ:-</b> <code>{plate}</code>\n"
                 f" ○   <b>የአሁኑ መገኛ:-</b> {curr_city}\n"
-                f" ○   <b>መድረሻ ከተማ:-</b> {target_city}\n"
+                f" ○   <b>መድረሻ (To):-</b> {target_city}\n"
                 f" ○   <b>ሹፌር:-</b> {driver}\n"
                 f" ○   <b>ስልክ:-</b> <code>{d_phone}</code>\n"
                 f" ○   <b>ረዳት ስልክ:-</b> <code>{h_phone}</code>\n"
@@ -135,7 +136,6 @@ def bot_polling():
                         cb_data = cb["data"]
                         
                         if "approve_" in cb_data:
-                            # ፖስቱ ሲጸድቅ ልዩ ID (መለያ ቁጥር) እዚህ ጋር ይፈጠራል
                             post_id = get_next_post_id()
                             lines = raw_text.split('\n')
                             
@@ -146,28 +146,18 @@ def bot_polling():
                             price = "---"
                             v_type = "---"
                             curr = "---"
-                            target = "---"
 
-                            # ከአድሚን መልዕክት ላይ መረጃዎችን በጥንቃቄ መለየት
+                            # ከአድሚን መልዕክት ላይ መረጃዎችን የመለያያ ዘዴ (በጣም ጠንካራ ሎጅክ)
                             for l in lines:
-                                if "የጭነት አይነት" in l or "አይነት" in l: 
-                                    cargo = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "መነሻ" in l or "መነሻ (From)" in l: 
-                                    dep = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "መድረሻ" in l or "መድረሻ (To)" in l: 
-                                    to = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "መጠን" in l: 
-                                    amount = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "የተመደብ ዋጋ" in l or "ዋጋ" in l: 
-                                    price = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "የመኪና አይነት" in l: 
-                                    v_type = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "የአሁኑ መገኛ" in l or "ያለበት" in l: 
-                                    curr = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
-                                if "መድረሻ ከተማ" in l:
-                                    target = l.split(':-')[-1].strip() if ':-' in l else l.split(':')[-1].strip()
+                                val = l.split(':-')[-1].strip() if ':-' in l else (l.split(':')[-1].strip() if ':' in l else "---")
+                                if "የጭነት አይነት" in l: cargo = val
+                                if "መነሻ" in l: dep = val
+                                if "መድረሻ" in l: to = val  # 'መድረሻ (To)' ወይም 'መድረሻ ከተማ' የሚሉትን ሁሉ ይይዛል
+                                if "መጠን" in l: amount = val
+                                if "የተመደብ ዋጋ" in l or "ዋጋ" in l: price = val
+                                if "የመኪና አይነት" in l: v_type = val
+                                if "የአሁኑ መገኛ" in l: curr = val
 
-                            # በምስል 1000054092.jpg እና 1000054094.jpg መሰረት ቻናል ላይ የሚለጠፈውን ጽሑፍ መገንባት
                             if "load" in cb_data:
                                 final_post = (
                                     f"📦 <b>[የሚጫን ጭነት አለኝ] - ID: <code>{post_id}</code></b>\n"
@@ -187,16 +177,14 @@ def bot_polling():
                                     "🔴 <b>ነፃ መኪና አለ! (የጭነት ጥያቄ)</b>\n\n"
                                     f" ○   <b>የመኪና አይነት:-</b> {v_type}\n"
                                     f" ○   <b>የአሁኑ መገኛ:-</b> {curr}\n"
-                                    f" ○   <b>መድረሻ ከተማ:-</b> {target}\n"
+                                    f" ○   <b>መድረሻ (To):-</b> {to}\n"  # መድረሻ ከተማ እዚህ ጋር በትክክል ይወጣል
                                     " ○   <b>የመጫኛ ዝግጁነት:-</b> ወዲያውኑ\n"
                                     "━━━━━━━━━━━━━━━━━━━━"
                                 )
                             
-                            # በምስል 1000054109.jpg መሰረት የበታች የሊንክ ጽሑፎችን ማያያዝ
                             final_post += f"\n\n✨ <b>ያሉበት ቦታ ሆነው ጭነት ወይም መኪና ለማግኘት ሊንኩን ይጫኑ</b> 👇\n🔗 {BOT_LINK}"
                             final_post += f"\n\n📩 <b>መረጃውን ለማግኘት ኤጀንቱን ያነጋግሩ</b> 👇"
                             
-                            # ወደ ኤጀንቱ መለያ ቁጥሩን ይዞ የሚሄድ ሊንክ (Deep Linking)
                             agent_url = f"https://t.me/{AGENT_USERNAME}?text=ሰላም%20የመለያ%20ቁጥር%20{post_id}%20ጭነት%20መረጃ%20እፈልጋለሁ"
                             
                             post_markup = {
@@ -207,11 +195,9 @@ def bot_polling():
                                 ]
                             }
                             
-                            # ወደ ቻናል እና ግሩፕ መላክ
                             send_to_telegram(CHANNEL_ID, final_post, post_markup)
                             send_to_telegram(GROUP_ID, final_post, post_markup)
                             
-                            # አድሚኑ ጋር የነበረውን መልዕክት ማስተካከል
                             requests.post(f"https://api.telegram.org/bot{BOT_TOKEN}/editMessageText", 
                                           json={
                                               "chat_id": ADMIN_ID, 
